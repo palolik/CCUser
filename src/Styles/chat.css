@@ -1,15 +1,5 @@
-/* styles.css */
-@font-face {
-  font-family: 'Cfont';
-  src: url('../assets/fonts/baskvl.ttf') format('truetype');
 
-}
-@font-face {
-  font-family: 'Dfont';
-  src: url('../assets/fonts/FashionWacks-Regular.ttf') format('truetype');
- 
-  letter-spacing: 20dvw;
-}
+
 
 .cm{
   @apply w-full;
