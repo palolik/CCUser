@@ -28,7 +28,7 @@ const Cproject = ({ eid }) => {
       const days = parseFloat(project.deliveryTime) || 0;
       return new Date(startedAt.getTime() + days * 24 * 60 * 60 * 1000);
     }
-    return new Date(startedAt.getTime() + project.time * 60 * 60 * 1000);
+    return new Date(startedAt.getTime() + project.time *24 * 60 * 60 * 1000);
   };
 
   useEffect(() => {

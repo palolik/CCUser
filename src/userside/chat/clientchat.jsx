@@ -221,7 +221,6 @@ const lastClientMsgIndex = messages.map(m => m.sender).lastIndexOf("client");
 
     try {
       setIsSending(true);
-      // When user sends, always scroll to bottom
       isNearBottomRef.current = true;
 
       if (hasFiles) {
