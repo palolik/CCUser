@@ -61,7 +61,7 @@ useEffect(() => {
   return (
     <div className="overflow-hidden h-100vm bg-gradient-to-br from-slate-50 to-slate-100">
       <Navber employee={employee} />
-      <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start h-full">
+      <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start  h-screen">
         <Euser employee={employee} />
       
         <Task userSpecialty={employee.rdep} eid={id} />
