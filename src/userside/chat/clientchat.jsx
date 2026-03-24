@@ -85,6 +85,7 @@ const Cchat = ({ selectedProjectId }) => {
   const scrollContainerRef = useRef(null);
   // Track whether the user is near the bottom so we only auto-scroll when appropriate
   const isNearBottomRef = useRef(true);
+const isOpenRef = useRef(true); // client chat is always visible when rendered
 
   const checkIfNearBottom = () => {
     const container = scrollContainerRef.current;
@@ -101,7 +102,22 @@ const scrollToBottom = useCallback((force = false) => {
   }
 }, []);
 
+useEffect(() => {
+  if (selectedProjectId) markMessagesRead();
+}, [selectedProjectId]);
 
+const markMessagesRead = async () => {
+  if (!selectedProjectId) return;
+  try {
+    await fetch(`${base_url}/clichat/mark-read/${selectedProjectId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sender: "manager" }), // mark manager's msgs as read
+    });
+  } catch (err) {
+    console.error("Error marking as read:", err);
+  }
+};
   // Only auto-scroll when a NEW message arrives and user is near the bottom
   const prevMessageCountRef = useRef(0);
   useEffect(() => {
@@ -146,15 +162,32 @@ const scrollToBottom = useCallback((force = false) => {
 
     const newSocket = new WebSocket(`${chat_url}?orderId=${selectedProjectId}`);
     newSocket.onopen = () => console.log('Connected to WebSocket');
-    newSocket.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages((prevMessages) => {
-        if (!prevMessages.some(msg => msg.time === newMessage.time && msg.text === newMessage.text)) {
-          return [...prevMessages, newMessage];
-        }
-        return prevMessages;
-      });
-    };
+   newSocket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  // Ignore initial history array dump
+  if (Array.isArray(data)) return;
+
+  // Handle read_update — manager has seen client's messages
+  if (data.type === "read_update") {
+    setMessages(prev =>
+      prev.map(m =>
+        m.sender === data.sender ? { ...m, read: true } : m
+      )
+    );
+    return;
+  }
+
+  // Mark manager's message as read immediately if chat is open
+  if (data.sender === "manager") markMessagesRead();
+
+  setMessages((prevMessages) => {
+    if (!prevMessages.some(msg => msg.time === data.time && msg.text === data.text)) {
+      return [...prevMessages, data];
+    }
+    return prevMessages;
+  });
+};
     newSocket.onerror = (error) => console.error('WebSocket error:', error);
     newSocket.onclose = () => console.log('WebSocket Disconnected');
     setSocket(newSocket);
@@ -171,6 +204,14 @@ const scrollToBottom = useCallback((force = false) => {
   const removeAttachedFile = (index) => {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const SeenLabel = ({ read }) => (
+  read
+    ? <span className="text-[10px] text-blue-300 mt-0.5">Seen</span>
+    : <span className="text-[10px] text-blue-200 mt-0.5">Sent</span>
+);
+
+const lastClientMsgIndex = messages.map(m => m.sender).lastIndexOf("client");
 
   const handleSendMessage = async () => {
     const hasText = inputValue.trim();
@@ -283,6 +324,11 @@ const scrollToBottom = useCallback((force = false) => {
 
                       <AttachmentPreview attachments={msg.attachments} isClient={isClient} />
                     </div>
+                    {isClient && index === lastClientMsgIndex && (
+  <div className="flex justify-end mt-0.5">
+    <SeenLabel read={msg.read} />
+  </div>
+)}
                   </div>
                 );
               })}
