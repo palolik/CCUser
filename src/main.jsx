@@ -26,6 +26,10 @@ import PortfolioDetail from './userside/userhome/homeportfolio/PortfolioDetails'
 import PaymentGateway from './userside/buypackage/paymentGateway';
 import SupportChat from './userside/userhome/supportchat/SupportChat';
 import Social from './userside/userhome/Social/Social';
+import PrivacyPolicy from './userside/footerpages/privactpolicy';
+import TermsConditions from './userside/footerpages/Terms&condition';
+import ForgotPasswordOtp from './userside/auth/otppage';
+import ResetPassword from './userside/auth/resetpasswordpage';
 
 
 const router = createBrowserRouter([
@@ -117,7 +121,19 @@ const router = createBrowserRouter([
     path: "/clientsignin",
     element: <Csignin></Csignin>,
   },
-
+  {
+    path: "/termsandcondition",
+    element: <TermsConditions></TermsConditions>,
+  },
+  {
+    path: "/privacypolicy",
+    element: <PrivacyPolicy></PrivacyPolicy>,
+  },
+{ path:"/forgot-password-otp" ,
+  element:<ForgotPasswordOtp />,
+},
+{ path:"/reset-password" ,
+  element:<ResetPassword />}
   // {
   //   path: "/marketerprofile",
   //   element: <MProfile></MProfile>

@@ -1,164 +1,258 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../Provider/AuthProvider';
-import { base_url } from '../../config/config';
-import Navber from '../navBer/navber';
-import Footer from '../footer/footer';
-import Stats from './stats/stats';
-import Tech from './tech/tech';
-import Whychooseus from './whychooseus/whychooseus';
-import Services from './services/services';
-import Faq from './faq/faq';
-import Packages from '../packages/packages';
-import Map from './map/map';
-import Home3 from './home/home3';
-import OurClient from './OurClient/OurClient';
-import Process from './process/process';
-import LoadingSpinner from '../utils/loaderSpinner';
-import SeoHead from '../../Seohead';
+import { useContext, useEffect, useRef, useState, lazy, Suspense } from "react";
+import { AuthContext } from "../Provider/AuthProvider";
+import { base_url } from "../../config/config";
+import Navber from "../navBer/navber";
+import Footer from "../footer/footer";
+import Home3 from "./home/home3";
+import SeoHead from "../../Seohead";
+
+const Stats = lazy(() => import("./stats/stats"));
+const Tech = lazy(() => import("./tech/tech"));
+const Whychooseus = lazy(() => import("./whychooseus/whychooseus"));
+const Services = lazy(() => import("./services/services"));
+const Faq = lazy(() => import("./faq/faq"));
+const Packages = lazy(() => import("../packages/packages"));
+const Map = lazy(() => import("./map/map"));
+const OurClient = lazy(() => import("./OurClient/OurClient"));
+const Process = lazy(() => import("./process/process"));
+
+const SectionLoader = () => (
+  <div className="w-full py-10 text-center text-gray-400 text-sm">
+    Loading section...
+  </div>
+);
+
+const useInView = () => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: "250px",
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, isVisible];
+};
+
+const LazySection = ({ children }) => {
+  const [ref, isVisible] = useInView();
+
+  return (
+    <div ref={ref} className="min-h-[120px]">
+      {isVisible ? (
+        <Suspense fallback={<SectionLoader />}>{children}</Suspense>
+      ) : null}
+    </div>
+  );
+};
 
 const Viewer = () => {
   const { userEmail, packageId } = useContext(AuthContext);
 
-  const [criticalLoading, setCriticalLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   const [data, setData] = useState({
     statsData: null,
-    packagesData: null,
-    faqs: null,
-    mapData: null,
-    ourClientData: null,
-    servicesData: null,
-    categoryData: null,
+    packagesData: [],
+    faqs: [],
+    mapData: [],
+    ourClientData: [],
+    servicesData: [],
+    categoryData: [],
     techData: null,
-    socialData: null,
-    adsData: null,
+    socialData: [],
+    adsData: [],
   });
 
-  // Remove initial loader
+  const [secondaryLoading, setSecondaryLoading] = useState(true);
+
   useEffect(() => {
-    document.body.classList.add('react-loaded');
+    document.body.classList.add("react-loaded");
+
     setTimeout(() => {
-      const initialLoader = document.getElementById('initial-loader');
+      const initialLoader = document.getElementById("initial-loader");
       if (initialLoader) initialLoader.remove();
     }, 300);
   }, []);
 
-  // Save login state
   useEffect(() => {
     if (userEmail) {
-      localStorage.setItem('isLogin', 'true');
+      localStorage.setItem("isLogin", "true");
     }
   }, [userEmail, packageId]);
 
-  // Fetch all data in parallel + fire visitor count
   useEffect(() => {
-    const fetchAllData = async () => {
+    let isMounted = true;
+
+    const cachedHomeData = localStorage.getItem("homeDataCache");
+
+    if (cachedHomeData) {
       try {
-        setCriticalLoading(true);
+        const parsed = JSON.parse(cachedHomeData);
+        setData((prev) => ({
+          ...prev,
+          ...parsed,
+        }));
+      } catch {
+        localStorage.removeItem("homeDataCache");
+      }
+    }
 
-        // Both requests fire at the same time
-        const [criticalRes, secondaryRes] = await Promise.all([
-          fetch(`${base_url}/home/critical`),
-          fetch(`${base_url}/home/secondary`),
-        ]);
+    const fetchCriticalData = async () => {
+      try {
+        const res = await fetch(`${base_url}/home/critical`);
 
-        if (!criticalRes.ok) throw new Error('Failed to fetch critical data');
-        if (!secondaryRes.ok) throw new Error('Failed to fetch secondary data');
+        if (!res.ok) {
+          throw new Error("Failed to fetch critical data");
+        }
 
-        const [critical, secondary] = await Promise.all([
-          criticalRes.json(),
-          secondaryRes.json(),
-        ]);
+        const critical = await res.json();
 
-        setData({
-          mapData: critical.maps || [],
-          socialData: critical.social || [],
-          categoryData: critical.category || [],
-          packagesData: secondary.packages || [],
-          faqs: secondary.faqs || [],
-          servicesData: secondary.services || [],
-          ourClientData: secondary.clients || [],
-          adsData: secondary.advertisements || [],
-          statsData: null,
-          techData: null,
+        if (!isMounted) return;
+
+        setData((prev) => {
+          const updated = {
+            ...prev,
+            mapData: critical.maps || [],
+            socialData: critical.social || [],
+            categoryData: critical.category || [],
+          };
+
+          localStorage.setItem("homeDataCache", JSON.stringify(updated));
+          return updated;
         });
-
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError(err.message);
-      } finally {
-        setCriticalLoading(false);
+      } catch (error) {
+        console.error("Critical data error:", error);
       }
     };
 
-    fetchAllData();
+    const fetchSecondaryData = async () => {
+      try {
+        setSecondaryLoading(true);
 
-    // Fire-and-forget visitor count — never blocks page load
+        const res = await fetch(`${base_url}/home/secondary`);
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch secondary data");
+        }
+
+        const secondary = await res.json();
+
+        if (!isMounted) return;
+
+        setData((prev) => {
+          const updated = {
+            ...prev,
+            packagesData: secondary.packages || [],
+            faqs: secondary.faqs || [],
+            servicesData: secondary.services || [],
+            ourClientData: secondary.clients || [],
+            adsData: secondary.advertisements || [],
+          };
+
+          localStorage.setItem("homeDataCache", JSON.stringify(updated));
+          return updated;
+        });
+      } catch (error) {
+        console.error("Secondary data error:", error);
+      } finally {
+        if (isMounted) {
+          setSecondaryLoading(false);
+        }
+      }
+    };
+
+    fetchCriticalData();
+    fetchSecondaryData();
+
     fetch(`${base_url}/vcount`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ increment: 1 }),
     }).catch(() => {});
 
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  if (criticalLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50">
-        <SeoHead
-          title="Software Development & Digital Solutions Since 2019"
-          description="Cloud Company helps businesses grow online with custom web development, app development, graphic design, social media marketing, and product design. Reliable tech since 2019."
-          canonical="/"
-          ogType="website"
-        />
-        <div className="text-center p-8 max-w-md">
-          <div className="w-16 h-16 mx-auto mb-4 text-red-500">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Oops! Something went wrong</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const sections = [
-    { component: <Home3 />, key: 'home' },
-    { component: <Stats statsData={data.statsData} />, key: 'stats' },
-    { component: <Tech techData={data.techData} />, key: 'tech' },
-    { component: <Map mapData={data.mapData} />, key: 'map' },
-    { component: <Process />, key: 'process' },
-    { component: <Packages category={data.categoryData} packages={data.packagesData} />, key: 'packages' },
-    { component: <Whychooseus />, key: 'whychooseus' },
-    { component: <OurClient clientData={data.ourClientData} />, key: 'clients' },
-    { component: <Services serviceData={data.servicesData} />, key: 'services' },
-    { component: <Faq faqs={data.faqs} />, key: 'faq' },
-  ];
 
   return (
     <div className="overflow-x-hidden w-full">
+      <SeoHead
+        title="Software Development & Digital Solutions Since 2019"
+        description="Cloud Company helps businesses grow online with custom web development, app development, graphic design, social media marketing, and product design. Reliable tech since 2019."
+        canonical="/"
+        ogType="website"
+      />
+
       <Navber />
-      {sections.map((section) => (
-        <div key={section.key}>
-          {section.component}
-        </div>
-      ))}
+
+      {/* This loads instantly */}
+      <Home3 />
+
+      {/* These load only when user scrolls near them */}
+      <LazySection>
+        <Stats statsData={data.statsData} />
+      </LazySection>
+
+      <LazySection>
+        <Tech techData={data.techData} />
+      </LazySection>
+
+      <LazySection>
+        <Map mapData={data.mapData} />
+      </LazySection>
+
+      <LazySection>
+        <Process />
+      </LazySection>
+
+      <LazySection>
+        <Packages
+          category={data.categoryData}
+          packages={data.packagesData}
+          loading={secondaryLoading}
+        />
+      </LazySection>
+
+      <LazySection>
+        <Whychooseus />
+      </LazySection>
+
+      <LazySection>
+        <OurClient
+          clientData={data.ourClientData}
+          loading={secondaryLoading}
+        />
+      </LazySection>
+
+      <LazySection>
+        <Services
+          serviceData={data.servicesData}
+          loading={secondaryLoading}
+        />
+      </LazySection>
+
+      <LazySection>
+        <Faq faqs={data.faqs} loading={secondaryLoading} />
+      </LazySection>
+
       <Footer />
     </div>
   );

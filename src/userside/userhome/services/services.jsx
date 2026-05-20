@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { base_url } from "../../../config/config";
-
+import AnimatedNetworkBackground from "../home/animatednetwork";
+import ServicesAnimatedBackground from "./serviceanimatedbackground";
 const Services = ({ serviceData = [] }) => {
   const [ads, setAds] = useState([]);
 
@@ -36,7 +37,8 @@ const Services = ({ serviceData = [] }) => {
   // Sidebar ad component
   const SidebarAds = ({ side }) => (
     <div className={`hidden lg:flex flex-col gap-3 fixed top-1/2 -translate-y-1/2 z-20 ${side === "left" ? "left-2" : "right-2"}`}>
-      {sidebarAds.map((ad) => (
+    
+  {sidebarAds.map((ad) => (
         <a key={ad._id + side} href={ad.rdlink} target="_blank" rel="noopener noreferrer"
           onClick={() => handleAdClick(ad._id)}>
           <img src={ad.imglink} alt={ad.rdlink}
@@ -47,8 +49,8 @@ const Services = ({ serviceData = [] }) => {
   );
 
   return (
-    <section className="relative py-24 px-6 bg-gray-50">
-
+    <section className="relative py-24 px-6 bg-white">
+  <ServicesAnimatedBackground />
       <SidebarAds side="left" />
       <SidebarAds side="right" />
 
@@ -63,7 +65,7 @@ const Services = ({ serviceData = [] }) => {
       </div>
 
       {/* Service rows */}
-      <div className="flex flex-col gap-5 max-w-4xl mx-auto">
+      <div className="flex flex-col gap-5 max-w-[70rem] mx-auto">
         {serviceData.map((service, idx) => (
           <motion.div
             key={idx}
@@ -71,7 +73,7 @@ const Services = ({ serviceData = [] }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.55, delay: idx * 0.08 }}
-            className={`group flex flex-col bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-blue-200 hover:shadow-2xl transition-all duration-300 ${
+            className={`group flex flex-col bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-blue-200 hover:shadow-2xl transition-all duration-300 z-50 ${
               idx % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
             }`}
             style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
@@ -85,9 +87,9 @@ const Services = ({ serviceData = [] }) => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
-              <div className="font-serif text-5xl font-semibold mb-3 leading-none"
-                style={{ fontFamily: "'Playfair Display', serif", color: "rgba(59,130,246,0.1)" }}>
+            <div className="flex-1 p-8 md:p-10 flex flex-col justify-start">
+              <div className="font-serif text-5xl font-semibold mb-12 leading-none"
+                style={{ fontFamily: "'Playfair Display', serif", color: "rgba(59,130,246,0.4)" }}>
                 0{idx + 1}
               </div>
               <h3 className="text-xl font-medium text-gray-900 mb-3 leading-snug group-hover:text-blue-700 transition-colors">

@@ -10,26 +10,35 @@ const Csignin = () => {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("client");
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
   const handleLogin = async (event) => {
     event.preventDefault();
+
     const loginData = { remail, rpass };
+
     try {
       const response = await fetch(`${base_url}/${activeTab}login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
+
       const data = await response.json();
+
       if (data.success && data.token && data.user) {
         await login(data.token);
+
         const role = data.user.role?.toLowerCase();
         const id = data.user.id;
+
         if (role === "client") navigate(`/clientprofile/${id}`);
         else if (role === "marketer") navigate(`/marketerprofile/${id}`);
-        else if (role === "emp" || role === "employee") navigate(`/employeeprofile/${id}`);
+        else if (role === "emp" || role === "employee")
+          navigate(`/employeeprofile/${id}`);
         else navigate(`/profile/${id}`);
       } else {
         setError(data.message || "Invalid credentials");
@@ -37,6 +46,48 @@ const Csignin = () => {
     } catch (error) {
       console.error("Error during login:", error);
       setError("An error occurred. Please try again.");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError("");
+
+    if (!remail) {
+      setError("Please enter your email first.");
+      return;
+    }
+
+    try {
+      setForgotLoading(true);
+
+      const response = await fetch(`${base_url}/forgot-password/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          remail,
+          userType: activeTab,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        navigate("/forgot-password-otp", {
+          state: {
+            remail,
+            userType: activeTab,
+          },
+        });
+      } else {
+        setError(data.message || "Failed to send OTP.");
+      }
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      setError("Failed to send OTP. Please try again.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -49,6 +100,7 @@ const Csignin = () => {
 
         <div className="flex mb-6 rounded-lg overflow-hidden border border-gray-200">
           <button
+            type="button"
             onClick={() => setActiveTab("client")}
             className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
               activeTab === "client"
@@ -58,7 +110,9 @@ const Csignin = () => {
           >
             Client
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab("employee")}
             className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
               activeTab === "employee"
@@ -69,11 +123,13 @@ const Csignin = () => {
             Employee
           </button>
         </div>
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
+
             <input
               type="email"
               value={remail}
@@ -88,6 +144,7 @@ const Csignin = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
+
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -97,6 +154,7 @@ const Csignin = () => {
                 required
                 className="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-400 focus:outline-none"
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -107,6 +165,17 @@ const Csignin = () => {
                 ) : (
                   <Eye className="w-5 h-5" />
                 )}
+              </button>
+            </div>
+
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={forgotLoading}
+                className="text-sm text-blue-500 hover:underline disabled:opacity-60"
+              >
+                {forgotLoading ? "Sending OTP..." : "Forgot Password?"}
               </button>
             </div>
           </div>

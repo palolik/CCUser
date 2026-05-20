@@ -57,15 +57,12 @@ const PortfolioDetails = () => {
 
         <div className="max-w-3xl mx-auto relative">
           <button onClick={() => navigate('/portfolio')}
-            className="inline-flex items-center gap-2 text-blue-900/60 hover:text-blue-300 text-sm font-light mb-8 transition-colors">
+            className="inline-flex items-center gap-2 text-blue-300/80 hover:text-blue-300 text-sm font-light mb-8 transition-colors">
             ← Back to Portfolio
           </button>
 
-          {p?.portfolioType && (
-            <div className="inline-block bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs tracking-[2px] uppercase px-4 py-1.5 rounded-full mb-5 font-medium">
-              {p.portfolioType.replace(/-/g, ' ')}
-            </div>
-          )}
+       
+          
 
           <h1 className="font-serif text-4xl md:text-5xl font-semibold text-blue-50 leading-tight mb-6"
             style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -75,19 +72,15 @@ const PortfolioDetails = () => {
           <div className="flex flex-wrap gap-5">
             {p?.createdAt && (
               <div className="flex items-center gap-2 text-sm text-blue-900/60 font-light">
-                📅 <span className="text-blue-300/80">{formatDate(p.createdAt)}</span>
+                 <span className="text-blue-300/80">{formatDate(p.createdAt)}</span>
               </div>
             )}
             {p?.portfolioType && (
               <div className="flex items-center gap-2 text-sm text-blue-900/60 font-light">
-                🏷 <span className="text-blue-300/80 capitalize">{p.portfolioType.replace(/-/g, ' ')}</span>
+                 <span className="text-blue-300/80 capitalize">{p.portfolioType.replace(/-/g, ' ')}</span>
               </div>
             )}
-            {p?.link && (
-              <div className="flex items-center gap-2 text-sm text-blue-900/60 font-light">
-                🔗 <span className="text-blue-300/80">Live Project</span>
-              </div>
-            )}
+           
           </div>
         </div>
       </section>
@@ -122,7 +115,7 @@ const PortfolioDetails = () => {
 
         {/* Info grid */}
         {p && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className=" gap-5">
 
             {/* Main card */}
             <div className="md:col-span-2 bg-white border border-gray-200 rounded-2xl p-7">
@@ -132,39 +125,7 @@ const PortfolioDetails = () => {
               {p.shortDetails && (
                 <p className="text-sm text-gray-500 font-light leading-relaxed">{p.shortDetails}</p>
               )}
-
-              {p.link && (
-                <>
-                  <div className="h-px bg-gray-100 my-6" />
-                  <p className="text-xs tracking-[2px] uppercase text-gray-400 font-medium mb-3">Live Link</p>
-                  <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-600 hover:bg-blue-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors break-all">
-                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3h7m0 0v7m0-7L10 14M5 5H3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-2" />
-                    </svg>
-                    {p.link}
-                  </a>
-                </>
-              )}
-
-              <div className="h-px bg-gray-100 my-6" />
-              <button onClick={() => navigate('/portfolio')}
-                className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium px-5 py-2.5 rounded-full transition-colors">
-                ← Back to all projects
-              </button>
-            </div>
-
-            {/* Sidebar */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col gap-5 h-fit">
-              {p.portfolioType && (
-                <div>
-                  <p className="text-xs tracking-[2px] uppercase text-gray-400 font-medium mb-2">Type</p>
-                  <span className="inline-block bg-blue-50 text-blue-600 text-xs font-medium px-3 py-1.5 rounded-full capitalize">
-                    {p.portfolioType.replace(/-/g, ' ')}
-                  </span>
-                </div>
-              )}
+          
 
               {p.createdAt && (
                 <div>
@@ -173,18 +134,25 @@ const PortfolioDetails = () => {
                 </div>
               )}
 
-              <div>
-                <p className="text-xs tracking-[2px] uppercase text-gray-400 font-medium mb-1.5">Company</p>
-                <p className="text-sm text-gray-700">Cloud Company</p>
-              </div>
 
-              <div>
-                <p className="text-xs tracking-[2px] uppercase text-gray-400 font-medium mb-1.5">Status</p>
-                <div className="inline-flex items-center gap-2 text-sm text-green-700 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-green-400 inline-block" /> Visible
-                </div>
-              </div>
+              {p.link && (
+                <>
+                  <div className="h-px bg-gray-100 my-6" />
+                  <a href={p.link.startsWith('http') ? p.link : `https://${p.link}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-600 hover:bg-blue-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors break-all">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3h7m0 0v7m0-7L10 14M5 5H3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-2" />
+                    </svg>
+                    Live Link
+                  </a>
+                </>
+              )}
+
+            
             </div>
+
+            
 
           </div>
         )}

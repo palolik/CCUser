@@ -128,6 +128,16 @@ const CSignUp = () => {
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
             />
           </div>
+           <div className="relative">
+            <FaLock className="absolute left-3 top-3 text-gray-400 text-lg" />
+            <input
+              type="password"
+              name="rpass"
+              placeholder="Password"
+              required
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            />
+          </div>
 
           {/* Country Dropdown */}
           <div className="relative">

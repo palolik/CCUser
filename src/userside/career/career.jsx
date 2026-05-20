@@ -8,6 +8,7 @@ import { MdOutlineDateRange } from "react-icons/md";
 import { FaRegAddressBook } from "react-icons/fa";
 import { RiTeamLine } from "react-icons/ri";
 import { AiOutlineTeam } from "react-icons/ai";
+import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
 
 const processSteps = [
   { icon: <FaRegAddressBook className="text-blue-700 " /> , title: "Apply", desc: "Submit your application and portfolio. We review every application carefully." },
@@ -66,6 +67,7 @@ const Career = () => {
       {/* ── HERO ── */}
       <section className="relative text-center px-6 py-28 overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+          <AnimatedNetworkBackground/>
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-96 pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 65%)" }} />
         <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs tracking-[2.5px] uppercase px-5 py-2 rounded-full mb-7 font-medium">
@@ -139,6 +141,7 @@ const Career = () => {
       {/* ── WHY US ── */}
       <section className="py-24 px-6 text-center relative overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 60%,#091528 100%)" }}>
+          <AnimatedNetworkBackground/>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-72 pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15),transparent 70%)" }} />
         <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4 relative">Why Work With Us</p>

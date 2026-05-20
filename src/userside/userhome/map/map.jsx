@@ -89,23 +89,21 @@ const Map = ({ mapData }) => {
             const origTop  = parseFloat(icon.position.top)  || 0;
             const origLeft = parseFloat(icon.position.left) || 0;
 
-            // Convert stored px → % of intrinsic SVG size
-            // (works at any rendered width)
             const topPct  = (origTop  / MAP_H) * 100;
             const leftPct = (origLeft / MAP_W) * 100;
 
-            const isHovered = hovered === icon.id;
+            const isHovered = hovered === icon._id;
 
             return (
               <div
-                key={icon.id}
+                key={icon._id}
                 className="absolute z-10"
                 style={{
                   top:  `${topPct}%`,
                   left: `${leftPct}%`,
                   transform: 'translate(-50%, -100%)',
                 }}
-                onMouseEnter={() => setHovered(icon.id)}
+                onMouseEnter={() => setHovered(icon._id)}
                 onMouseLeave={() => setHovered(null)}
               >
                 {/* Tooltip */}

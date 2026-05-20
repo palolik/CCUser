@@ -16,15 +16,21 @@ const Packages = ({ category = [], packages = [] }) => {
     setIsLoggedIn(!!localStorage.getItem("authToken"));
   }, [category]);
 
-  const handleProductClick = async (id) => {
-    try {
-      await fetch(`${base_url}/packageclicks/${id}`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ incrementBy: 1 }),
-      });
-    } catch (e) { console.error(e); }
-    navigate(`/packdetails/${id}`);
-  };
+ const handleProductClick = (id) => {
+  if (!id) return;
+
+
+  navigate(`/packdetails/${id}`);
+
+
+  fetch(`${base_url}/packageclicks/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ incrementBy: 1 }),
+  }).catch((e) => {
+    console.error("Package click tracking failed:", e);
+  });
+};
 
   const handlePurchaseClick = (pack) => {
     if (!isLoggedIn) return toast.error("Please log in first to make a purchase!");
@@ -43,7 +49,7 @@ const Packages = ({ category = [], packages = [] }) => {
 const filteredPacks = isCustom ? [] : (packages ?? []).filter(
   (p) => p.category === selectedCategory && p.status === "approved"
 );
-  // Mark middle card as featured
+
   const withFeatured = filteredPacks.map((p, i) => ({
     ...p, featured: i === Math.floor(filteredPacks.length / 2),
   }));
@@ -60,7 +66,6 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
   return (
     <section className="py-24 px-6 bg-gray-50">
 
-      {/* Header */}
       <div className="text-center mb-12">
         <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">Pricing</p>
         <h2 className="font-serif text-4xl md:text-5xl font-semibold text-gray-900 leading-tight"

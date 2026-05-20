@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import Navber from "../../navBer/navber";
 import Footer from "../../footer/footer";
 import { base_url } from "../../../config/config";
+import AnimatedNetworkBackground from "../home/animatednetwork";
 
 const HomePortfolio = () => {
   const [portfolios, setPortfolios] = useState([]);
@@ -57,6 +58,7 @@ const HomePortfolio = () => {
       
       <section className="relative text-center px-6 py-24 overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+          <AnimatedNetworkBackground/>
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-96 pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 65%)" }} />
         <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs tracking-[2.5px] uppercase px-5 py-2 rounded-full mb-6 font-medium">

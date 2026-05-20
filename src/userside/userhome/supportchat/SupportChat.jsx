@@ -17,18 +17,31 @@ const SupportChat = ({ forceOpen = false }) => {
   const [inputValue, setInputValue] = useState("");
   const [socket, setSocket] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [isSessionClosed, setIsSessionClosed] = useState(false);
+
   const chatEndRef = useRef(null);
-  const isOpenRef = useRef(false); // ✅ ref to avoid stale closure in WebSocket
+  const isOpenRef = useRef(false);
+  const socketRef = useRef(null);
 
   // Sync ref with state
   useEffect(() => {
     isOpenRef.current = isOpen;
     // Mark manager messages as read when user opens the chat
-    if (isOpen && supportId) markMessagesRead();
-  }, [isOpen, supportId]);
+    if (isOpen && supportId && !isSessionClosed) markMessagesRead();
+  }, [isOpen, supportId, isSessionClosed]);
 
   // Load user from localStorage
   useEffect(() => {
+    const sessionClosed = localStorage.getItem("supportChatClosed") === "true";
+
+    if (sessionClosed) {
+      setIsSessionClosed(true);
+      setIsFormSubmitted(false);
+      setSupportId(null);
+      setMessages([]);
+      return;
+    }
+
     const storedUser = localStorage.getItem("authUser");
     if (storedUser) {
       try {
@@ -61,8 +74,8 @@ const SupportChat = ({ forceOpen = false }) => {
   }, []);
 
   useEffect(() => {
-    if (forceOpen) setIsOpen(true);
-  }, [forceOpen]);
+    if (forceOpen && !isSessionClosed) setIsOpen(true);
+  }, [forceOpen, isSessionClosed]);
 
   // Mark manager's messages as read (called only when chat is open)
   const markMessagesRead = async () => {
@@ -79,7 +92,7 @@ const SupportChat = ({ forceOpen = false }) => {
   };
 
   const fetchMessages = async () => {
-    if (!supportId) return;
+    if (!supportId || isSessionClosed) return;
     try {
       const response = await fetch(`${base_url}/schat/${supportId}`);
       if (!response.ok) throw new Error("Failed to fetch messages");
@@ -90,32 +103,29 @@ const SupportChat = ({ forceOpen = false }) => {
     }
   };
 
-  // Polling + WebSocket setup
   useEffect(() => {
-    if (!supportId) return;
+    if (!supportId || isSessionClosed) return;
 
     fetchMessages();
     const interval = setInterval(fetchMessages, 1000);
 
     const newSocket = new WebSocket(`${chat_url}?supportId=${supportId}`);
+    socketRef.current = newSocket;
     newSocket.onopen = () => console.log("Support chat WebSocket connected");
-       newSocket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+    newSocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
 
-  // ✅ Ignore the initial array dump on connect — polling handles history
-  if (Array.isArray(data)) return;
+      if (Array.isArray(data)) return;
 
-  // Single new message
-  setMessages((prev) => {
-    if (!prev.some((msg) => msg.time === data.time && msg.text === data.text)) {
-      return [...prev, data];
-    }
-    return prev;
-  });
+      setMessages((prev) => {
+        if (!prev.some((msg) => msg.time === data.time && msg.text === data.text)) {
+          return [...prev, data];
+        }
+        return prev;
+      });
 
-  // ✅ Only mark read if chat is actually open
-  if (isOpenRef.current && data.sender === "manager") markMessagesRead();
-};
+      if (isOpenRef.current && data.sender === "manager") markMessagesRead();
+    };
     newSocket.onclose = () => console.log("Support chat WebSocket closed");
 
     setSocket(newSocket);
@@ -123,11 +133,35 @@ const SupportChat = ({ forceOpen = false }) => {
       newSocket.close();
       clearInterval(interval);
     };
-  }, [supportId]);
+  }, [supportId, isSessionClosed]);
 
+  const handleCloseChatSession = () => {
+    localStorage.setItem("supportChatClosed", "true");
+    localStorage.removeItem("supportUser");
+
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
+
+    setSocket(null);
+    setIsOpen(false);
+    setIsSessionClosed(true);
+    setIsFormSubmitted(false);
+    setSupportId(null);
+    setMessages([]);
+    setInputValue("");
+    setUserInfo({ name: "", email: "" });
+  };
+
+  const handleStartNewChat = () => {
+    localStorage.removeItem("supportChatClosed");
+    setIsSessionClosed(false);
+    setIsOpen(true);
+  };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || !supportId || isSending) return;
+    if (!inputValue.trim() || !supportId || isSending || isSessionClosed) return;
 
     const message = {
       supportId,
@@ -164,6 +198,8 @@ const SupportChat = ({ forceOpen = false }) => {
     e.preventDefault();
     if (userInfo.name.trim() && userInfo.email.trim()) {
       const emailId = userInfo.email.trim().toLowerCase();
+      localStorage.removeItem("supportChatClosed");
+      setIsSessionClosed(false);
       setSupportId(emailId);
       setIsFormSubmitted(true);
       localStorage.setItem("supportUser", JSON.stringify(userInfo));
@@ -172,9 +208,18 @@ const SupportChat = ({ forceOpen = false }) => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {!isOpen && (
+      {!isOpen && !isSessionClosed && (
         <button
           onClick={() => setIsOpen(true)}
+          className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
+        >
+          <MessageCircle size={24} />
+        </button>
+      )}
+
+      {!isOpen && isSessionClosed && (
+        <button
+          onClick={handleStartNewChat}
           className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
         >
           <MessageCircle size={24} />
@@ -195,6 +240,18 @@ const SupportChat = ({ forceOpen = false }) => {
               ✕
             </button>
           </div>
+
+          {isFormSubmitted && (
+            <div className="px-4 py-2 border-b bg-white">
+              <button
+                type="button"
+                onClick={handleCloseChatSession}
+                className="w-full border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm font-medium transition-all"
+              >
+                Close chat session permanently
+              </button>
+            </div>
+          )}
 
           {!isFormSubmitted ? (
             <form onSubmit={handleFormSubmit} className="p-4 space-y-3">
@@ -226,35 +283,35 @@ const SupportChat = ({ forceOpen = false }) => {
                 className="flex-1 overflow-y-auto px-4 py-3 space-y-2"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "#93c5fd #f1f5f9", maxHeight: "60vh" }}
               >
-             {messages.length === 0 ? (
-  <p className="text-center text-gray-500 text-sm pt-4">Start your conversation below 👋</p>
-) : (
-  (() => {
-    const lastUserMsgIndex = messages.map(m => m.sender).lastIndexOf("user");
-    return messages.map((msg, i) => (
-      <div key={i} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
-        <div
-          className={`px-3 py-2 rounded-2xl max-w-[75%] ${
-            msg.sender === "user"
-              ? "bg-blue-500 text-white rounded-br-sm"
-              : "bg-gray-100 text-gray-800 rounded-bl-sm"
-          }`}
-        >
-          <p className="text-sm">{msg.text}</p>
-          <div className={`flex items-center gap-0.5 mt-0.5 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-            <span className={`text-[10px] ${msg.sender === "user" ? "text-blue-100" : "text-gray-400"}`}>
-              {new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </span>
-          </div>
-        </div>
-        {/* ✅ Seen label below the bubble, only on last user message */}
-        {msg.sender === "user" && i === lastUserMsgIndex && (
-          <SeenLabel read={msg.read} />
-        )}
-      </div>
-    ));
-  })()
-)}
+                {messages.length === 0 ? (
+                  <p className="text-center text-gray-500 text-sm pt-4">Start your conversation below 👋</p>
+                ) : (
+                  (() => {
+                    const lastUserMsgIndex = messages.map(m => m.sender).lastIndexOf("user");
+                    return messages.map((msg, i) => (
+                      <div key={i} className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}>
+                        <div
+                          className={`px-3 py-2 rounded-2xl max-w-[75%] ${
+                            msg.sender === "user"
+                              ? "bg-blue-500 text-white rounded-br-sm"
+                              : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                          }`}
+                        >
+                          <p className="text-sm">{msg.text}</p>
+                          <div className={`flex items-center gap-0.5 mt-0.5 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                            <span className={`text-[10px] ${msg.sender === "user" ? "text-blue-100" : "text-gray-400"}`}>
+                              {new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          </div>
+                        </div>
+
+                        {msg.sender === "user" && i === lastUserMsgIndex && (
+                          <SeenLabel read={msg.read} />
+                        )}
+                      </div>
+                    ));
+                  })()
+                )}
                 <div ref={chatEndRef} />
               </div>
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import background  from "/assets/back/2.svg";  // viewBox 750×500 (landscape/wide)
 import background2 from "/assets/back/3.svg";  // viewBox 500×500 (square)
 import background3 from "/assets/back/4.svg";  // viewBox 500×500 (square)
-
+import AnimatedNetworkBackground from "./animatednetwork";
 const slides = [
   {
     title: ["Your Gateway to the", "Online Business World"],
@@ -50,12 +50,23 @@ const Home3 = () => {
   const s = slides[current];
 
   return (
-    <section className="relative w-full min-h-screen flex overflow-hidden"
-      style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+<section
+  className="relative w-full min-h-screen flex overflow-hidden"
+  style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }}
+>
+  <AnimatedNetworkBackground />
 
-      {/* Background glow */}
-      <div className="absolute top-0 left-1/3 w-[600px] h-[500px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)" }} />
+  {/* Background glow */}
+  <div
+    className="absolute top-0 left-1/3 w-[600px] h-[500px] pointer-events-none z-[1]"
+    style={{
+      background:
+        "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)",
+    }}
+  />
 
       {/* ── LEFT: Text (always 55% on desktop, full on mobile) ── */}
       <div className="relative z-10 flex flex-col justify-center

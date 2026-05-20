@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navber from "../navBer/navber";
 import Footer from "../footer/footer";
 import { base_url } from "../../config/config";
+import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
 
 const rankLabels = {
   1: "Leadership",
@@ -53,7 +54,7 @@ const Team = () => {
       <section
         className="relative text-center px-6 py-24 overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}
-      >
+      ><AnimatedNetworkBackground/>
         <div
           className="absolute -top-20 left-1/2 -translate-x-1/2 w-[700px] h-96 pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 65%)" }}

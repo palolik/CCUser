@@ -5,6 +5,7 @@ import SeoHead from "../../../Seohead";
 import { NavLink } from "react-router-dom";
 import missionImg from "/assets/tt.svg"; 
 import storyImg from "/assets/sss.svg";
+import AnimatedNetworkBackground from "../home/animatednetwork";
 const stats = [
   { value: "5+", label: "Years Active" },
   { value: "200+", label: "Projects Delivered" },
@@ -40,6 +41,7 @@ const Aboutus = () => {
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+          <AnimatedNetworkBackground/>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15) 0%,transparent 65%)" }} />
 
@@ -176,6 +178,7 @@ const Aboutus = () => {
       {/* ── CTA ── */}
       <section className="py-24 px-6 text-center relative overflow-hidden"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 60%,#091528 100%)" }}>
+          <AnimatedNetworkBackground/>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-72 pointer-events-none"
           style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.15),transparent 70%)" }} />
         <h2 className="font-serif text-4xl md:text-5xl font-semibold text-blue-50 mb-5 relative"

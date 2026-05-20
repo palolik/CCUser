@@ -92,149 +92,201 @@ const generateInvoicePDF = (order) => {
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
+  const marginX = 14;
+  const primary = [37, 99, 235];
+  const dark = [15, 23, 42];
+  const muted = [100, 116, 139];
+  const light = [248, 250, 252];
+  const border = [226, 232, 240];
+
   const img = new Image();
   img.src = "/assets/logo.png";
-  img.onload = () => {
 
+  img.onload = () => {
+    // Background
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pageW, pageH, "F");
 
-    // ── Header: logo left, INVOICE right ──
-    doc.addImage(img, "PNG", 10, 8, 52, 23);
+    // Header
+    doc.addImage(img, "PNG", marginX, 14, 48, 21);
 
-    doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(30, 41, 59);
-    doc.text("INVOICE", pageW - 12, 20, { align: "right" });
+    doc.setFontSize(26);
+    doc.setTextColor(...dark);
+    doc.text("INVOICE", pageW - marginX, 22, { align: "right" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...muted);
+    doc.text(`Invoice No: INV-${order._id.slice(-8).toUpperCase()}`, pageW - marginX, 30, { align: "right" });
+    doc.text(`Issue Date: ${new Date(order.createdAt).toLocaleDateString()}`, pageW - marginX, 36, { align: "right" });
+
+    // Company info
+    doc.setDrawColor(...border);
+    doc.line(marginX, 45, pageW - marginX, 45);
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text(`INV-${order._id.slice(-8).toUpperCase()}`, pageW - 12, 27, { align: "right" });
-    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, pageW - 12, 33, { align: "right" });
+    doc.setTextColor(...muted);
+    doc.text("Cloud Company", marginX, 53);
+    doc.text("cloudcompany.cc", marginX, 58);
+    doc.text("support@cloudcompany.cc", marginX, 63);
 
-    // ── Blue accent line under header ──
-    doc.setFillColor(59, 130, 246);
-    doc.rect(0, 40, pageW, 2, "F");
+    // Bill To box
+    doc.setFillColor(...light);
+    doc.setDrawColor(...border);
+    doc.roundedRect(marginX, 75, 84, 42, 3, 3, "FD");
 
-    // ── Company info row under accent line ──
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(148, 163, 184);
-    doc.text("cloudcompany.cc  |  support@cloudcompany.cc", 12, 48);
-
-    // ── Bill To + Order Info boxes ──
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(12, 54, 85, 38, 3, 3, "F");
-    doc.roundedRect(110, 54, 88, 38, 3, 3, "F");
-
-    // Bill To
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(148, 163, 184);
-    doc.text("BILL TO", 18, 62);
-    doc.setFontSize(10);
+    doc.setTextColor(...primary);
+    doc.text("BILL TO", marginX + 6, 84);
+
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(15, 23, 42);
-    doc.text(order.buyername, 18, 69);
+    doc.setTextColor(...dark);
+    doc.text(order.buyername || "Client Name", marginX + 6, 94);
+
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text(order.email, 18, 75);
+    doc.setTextColor(...muted);
+    doc.text(order.email || "Client Email", marginX + 6, 101);
 
-    // Order Info
+    // Project details box
+    doc.setFillColor(...light);
+    doc.setDrawColor(...border);
+    doc.roundedRect(pageW - marginX - 84, 75, 84, 42, 3, 3, "FD");
+
     doc.setFontSize(7);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(148, 163, 184);
-    doc.text("ORDER INFO", 116, 62);
+    doc.setTextColor(...primary);
+    doc.text("PROJECT DETAILS", pageW - marginX - 78, 84);
+
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text("Package:", 116, 69);
-    doc.text("Project:", 116, 75);
-    doc.text("Status:", 116, 81);
-    doc.setTextColor(15, 23, 42);
+    doc.setTextColor(...muted);
+    doc.text("Package", pageW - marginX - 78, 94);
+    doc.text("Project", pageW - marginX - 78, 104);
+
     doc.setFont("helvetica", "bold");
-    doc.text(order.packageName, 135, 69);
-    doc.text(order.projectTitle, 135, 75);
-    doc.text(order.status.charAt(0).toUpperCase() + order.status.slice(1), 135, 81);
+    doc.setTextColor(...dark);
+
+    const packageName = doc.splitTextToSize(order.packageName || "N/A", 48);
+    const projectTitle = doc.splitTextToSize(order.projectTitle || "N/A", 48);
+
+    doc.text(packageName, pageW - marginX - 42, 94);
+    doc.text(projectTitle, pageW - marginX - 42, 104);
 
     // Order ID
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(148, 163, 184);
-    doc.text(`Order ID: ${order._id}`, 12, 98);
+    doc.setTextColor(...muted);
+    doc.text(`Order ID: ${order._id}`, marginX, 128);
 
-    // ── Deliverables Table ──
+    // Section title
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...dark);
+    doc.text("Invoice Items", marginX, 140);
+
+    // Deliverables table without status
     autoTable(doc, {
-      head: [["#", "Deliverable", "Status"]],
-      body: order.packageContents?.map((item, i) => [
-        i + 1,
-        item.name,
-        item.isDone ? "Done" : "Pending",
-      ]),
-      startY: 103,
-      theme: "plain",
+      head: [["#", "Description"]],
+      body: order.packageContents?.length
+        ? order.packageContents.map((item, i) => [
+            i + 1,
+            item.name,
+          ])
+        : [["1", order.packageName || "Service Package"]],
+      startY: 146,
+      theme: "grid",
+      margin: { left: marginX, right: marginX },
       headStyles: {
-        fillColor: [241, 245, 249],
-        textColor: [30, 41, 59],
-        fontSize: 8,
+        fillColor: primary,
+        textColor: [255, 255, 255],
+        fontSize: 9,
         fontStyle: "bold",
-        cellPadding: 5,
+        cellPadding: 4,
+        lineWidth: 0,
       },
       bodyStyles: {
         fontSize: 9,
-        cellPadding: 5,
-        textColor: [30, 41, 59],
+        cellPadding: 4,
+        textColor: dark,
+        lineColor: border,
+        lineWidth: 0.2,
       },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
+      alternateRowStyles: {
+        fillColor: light,
+      },
       columnStyles: {
-        0: { cellWidth: 12, halign: "center" },
-        1: { cellWidth: "auto" },
-        2: { cellWidth: 32, halign: "center" },
-      },
-      didParseCell: (data) => {
-        if (data.column.index === 2 && data.section === "body") {
-          const val = data.cell.raw;
-          data.cell.styles.textColor =
-            val === "Done" ? [5, 150, 105] : [148, 163, 184];
-          data.cell.styles.fontStyle = "bold";
-        }
+        0: {
+          cellWidth: 14,
+          halign: "center",
+        },
+        1: {
+          cellWidth: "auto",
+        },
       },
     });
 
-    const y = doc.lastAutoTable.finalY;
+    const y = doc.lastAutoTable.finalY + 12;
 
-    // ── Total box ──
-    doc.setFillColor(241, 245, 249);
-    doc.roundedRect(pageW - 80, y + 10, 68, 20, 3, 3, "F");
-    doc.setFontSize(9);
+    // Payment summary
+    doc.setFillColor(...light);
+    doc.setDrawColor(...border);
+    doc.roundedRect(pageW - marginX - 78, y, 78, 34, 3, 3, "FD");
+
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text("TOTAL AMOUNT", pageW - 46, y + 18, { align: "center" });
-    doc.setFontSize(13);
+    doc.setTextColor(...muted);
+    doc.text("Subtotal", pageW - marginX - 70, y + 10);
+    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 10, { align: "right" });
+
+    doc.setDrawColor(...border);
+    doc.line(pageW - marginX - 70, y + 16, pageW - marginX - 8, y + 16);
+
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(30, 41, 59);
-    doc.text(`$${parseFloat(order.sellPrice).toFixed(2)}`, pageW - 46, y + 26, { align: "center" });
+    doc.setTextColor(...dark);
+    doc.text("Total", pageW - marginX - 70, y + 26);
 
-    // ── Footer pinned to absolute bottom of page ──
-    doc.setFillColor(248, 250, 252);
-    doc.rect(0, pageH - 20, pageW, 20, "F");
+    doc.setFontSize(14);
+    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 26, { align: "right" });
 
-    doc.setFillColor(59, 130, 246);
-    doc.rect(0, pageH - 20, pageW, 1.5, "F");
+    // Notes
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...muted);
+    doc.text("Notes", marginX, y + 10);
 
     doc.setFontSize(7.5);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(100, 116, 139);
-    doc.text("Thank you for choosing Cloud Company!", pageW / 2, pageH - 11, { align: "center" });
+    doc.text(
+      "Thank you for your business. This invoice was generated electronically and does not require a physical signature.",
+      marginX,
+      y + 17,
+      { maxWidth: 105 }
+    );
+
+    // Footer
+    doc.setFillColor(...light);
+    doc.rect(0, pageH - 24, pageW, 24, "F");
+
+    doc.setFillColor(...primary);
+    doc.rect(0, pageH - 24, pageW, 1.5, "F");
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...dark);
+    doc.text("Cloud Company", pageW / 2, pageH - 14, { align: "center" });
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(148, 163, 184);
+    doc.setTextColor(...muted);
     doc.text(
-      "support@cloudcompany.cc  |  cloudcompany.cc  |  Computer-generated, no signature required.",
-      pageW / 2, pageH - 5,
+      "support@cloudcompany.cc  |  cloudcompany.cc  |  Computer-generated invoice",
+      pageW / 2,
+      pageH - 8,
       { align: "center" }
     );
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AnimatedNetworkBackground from "../home/animatednetwork";
 
 const reasons = [
   { text: "Customer-focused, convincing copy that sells harder and converts better." },
@@ -23,7 +24,7 @@ const Whychooseus = () => {
   return (
     <section className="w-full py-24 px-6 relative overflow-hidden"
       style={{ background: "linear-gradient(160deg,#0a0f1e 0%,#0d1a35 60%,#091528 100%)" }}>
-
+<AnimatedNetworkBackground/>
       {/* Glow */}
       <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-96 pointer-events-none"
         style={{ background: "radial-gradient(ellipse,rgba(56,130,246,0.13) 0%,transparent 70%)" }} />
