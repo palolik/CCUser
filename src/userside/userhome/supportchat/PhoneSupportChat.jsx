@@ -16,11 +16,24 @@ const PhoneSupportChat = ({ onClose }) => {
   const [inputValue, setInputValue] = useState("");
   const [socket, setSocket] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [isSessionClosed, setIsSessionClosed] = useState(false);
+
   const chatEndRef = useRef(null);
   const isOpenRef = useRef(true); // phone chat is always open when mounted
+  const socketRef = useRef(null);
 
   // Load user from localStorage
   useEffect(() => {
+    const sessionClosed = localStorage.getItem("supportChatClosed") === "true";
+
+    if (sessionClosed) {
+      setIsSessionClosed(true);
+      setIsFormSubmitted(false);
+      setSupportId(null);
+      setMessages([]);
+      return;
+    }
+
     const authRaw = localStorage.getItem("authUser");
     if (authRaw) {
       try {
@@ -49,7 +62,7 @@ const PhoneSupportChat = ({ onClose }) => {
 
   // Mark manager's messages as read (only when component is mounted/visible)
   const markMessagesRead = async () => {
-    if (!supportId) return;
+    if (!supportId || isSessionClosed) return;
     try {
       await fetch(`${base_url}/schat/mark-read/${supportId}`, {
         method: "POST",
@@ -62,7 +75,7 @@ const PhoneSupportChat = ({ onClose }) => {
   };
 
   const fetchMessages = async () => {
-    if (!supportId) return;
+    if (!supportId || isSessionClosed) return;
     try {
       const res = await fetch(`${base_url}/schat/${supportId}`);
       const data = await res.json();
@@ -74,8 +87,8 @@ const PhoneSupportChat = ({ onClose }) => {
 
   // Mark as read on mount (phone chat is open the moment it renders)
   useEffect(() => {
-    if (supportId) markMessagesRead();
-  }, [supportId]);
+    if (supportId && !isSessionClosed) markMessagesRead();
+  }, [supportId, isSessionClosed]);
 
   // Cleanup: mark as untracked when unmounted
   useEffect(() => {
@@ -86,12 +99,13 @@ const PhoneSupportChat = ({ onClose }) => {
 
   // Polling + WebSocket
   useEffect(() => {
-    if (!supportId) return;
+    if (!supportId || isSessionClosed) return;
 
     fetchMessages();
     const interval = setInterval(fetchMessages, 1000);
 
     const newSocket = new WebSocket(`${chat_url}?supportId=${supportId}`);
+    socketRef.current = newSocket;
 
     newSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -110,15 +124,38 @@ const PhoneSupportChat = ({ onClose }) => {
     };
 
     setSocket(newSocket);
+
     return () => {
       newSocket.close();
       clearInterval(interval);
+      if (socketRef.current === newSocket) {
+        socketRef.current = null;
+      }
     };
-  }, [supportId]);
+  }, [supportId, isSessionClosed]);
 
+  const handleCloseChatSession = () => {
+    localStorage.setItem("supportChatClosed", "true");
+    localStorage.removeItem("supportUser");
+
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
+
+    setSocket(null);
+    setIsSessionClosed(true);
+    setIsFormSubmitted(false);
+    setSupportId(null);
+    setMessages([]);
+    setInputValue("");
+    setUserInfo({ name: "", email: "" });
+
+    if (onClose) onClose();
+  };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || !supportId || isSending) return;
+    if (!inputValue.trim() || !supportId || isSending || isSessionClosed) return;
 
     const message = {
       supportId,
@@ -137,7 +174,13 @@ const PhoneSupportChat = ({ onClose }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(message),
       });
-      if (newSocket?.readyState === WebSocket.OPEN) newSocket.send(JSON.stringify(message));
+
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.send(JSON.stringify(message));
+      } else if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+      }
+
       setMessages((prev) => [...prev, message]);
       setInputValue("");
     } catch (err) {
@@ -151,6 +194,8 @@ const PhoneSupportChat = ({ onClose }) => {
     e.preventDefault();
     if (userInfo.name.trim() && userInfo.email.trim()) {
       const emailId = userInfo.email.trim().toLowerCase();
+      localStorage.removeItem("supportChatClosed");
+      setIsSessionClosed(false);
       setSupportId(emailId);
       setIsFormSubmitted(true);
       localStorage.setItem("supportUser", JSON.stringify(userInfo));
@@ -171,6 +216,18 @@ const PhoneSupportChat = ({ onClose }) => {
           <X size={22} />
         </button>
       </div>
+
+      {isFormSubmitted && (
+        <div className="px-4 py-2 border-b bg-white">
+          <button
+            type="button"
+            onClick={handleCloseChatSession}
+            className="w-full border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm font-medium transition-all"
+          >
+            Close chat session permanently
+          </button>
+        </div>
+      )}
 
       {!isFormSubmitted ? (
         <form onSubmit={handleFormSubmit} className="p-4 space-y-3 flex-1">
