@@ -50,6 +50,8 @@ const Portfolio = ({ userid }) => {
     formData.append("portfolioType", form.portfolioType);
     formData.append("image", form.image);
     formData.append("userId", userid);
+    formData.append("status", "pending");
+
     try {
       const res = await fetch(`${base_url}/portfolio`, { method: "POST", body: formData });
       const data = await res.json();
@@ -91,31 +93,61 @@ const Portfolio = ({ userid }) => {
     });
   };
 
-  const StatusBadge = ({ status }) => {
-    if (status === "visible") {
-      return (
-        <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold px-2.5 py-1 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-          Approved
-        </span>
-      );
-    }
-    if (status === "hidden") {
-      return (
-        <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 border border-red-200 text-xs font-semibold px-2.5 py-1 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
-          Rejected
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold px-2.5 py-1 rounded-full">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
-        Pending
-      </span>
-    );
+ const StatusBadge = ({ status }) => {
+  const normalizedStatus = String(status || "pending").toLowerCase();
+
+  const statusConfig = {
+    visible: {
+      label: "Visible",
+      wrapper:
+        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      dot: "bg-emerald-500",
+    },
+    show: {
+      label: "Visible",
+      wrapper:
+        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      dot: "bg-emerald-500",
+    },
+    hidden: {
+      label: "Hidden",
+      wrapper:
+        "bg-slate-50 text-slate-600 border border-slate-200",
+      dot: "bg-slate-500",
+    },
+    archived: {
+      label: "Archived",
+      wrapper:
+        "bg-amber-50 text-amber-700 border border-amber-200",
+      dot: "bg-amber-500",
+    },
+    pending: {
+      label: "Pending",
+      wrapper:
+        "bg-blue-50 text-blue-700 border border-blue-200",
+      dot: "bg-blue-500",
+    },
+    rejected: {
+      label: "Rejected",
+      wrapper:
+        "bg-red-50 text-red-600 border border-red-200",
+      dot: "bg-red-500",
+    },
   };
 
+  const config = statusConfig[normalizedStatus] || statusConfig.pending;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${config.wrapper}`}
+    >
+      <span
+        className={`w-1.5 h-1.5 rounded-full inline-block ${config.dot}`}
+      ></span>
+      {config.label}
+    </span>
+  );
+};
   return (
     <div className="space-y-4">
 
@@ -139,7 +171,7 @@ const Portfolio = ({ userid }) => {
             className="group flex gap-4 p-4 bg-white border border-gray-100 rounded-xl
               hover:border-blue-100 hover:shadow-md transition-all duration-200"
           >
-            {/* Thumbnail */}
+            
             <div className="flex-shrink-0 relative">
               <img
                 src={item.image}
@@ -188,8 +220,8 @@ const Portfolio = ({ userid }) => {
                 {item.shortDetails}
               </p>
 
-              <div className="flex items-center gap-3 mt-2.5">
-                {item.link && (
+              <div className="flex items-center  mt-2.5">
+                {item.link && item.status  !== "rejected" && (
                   <a
                     href={item.link}
                     target="_blank"
@@ -205,7 +237,7 @@ const Portfolio = ({ userid }) => {
                   </a>
                 )}
 
-                {item.status === "hidden" && item.statusNote && (
+                {item.status === "rejected" && item.statusNote && (
                   <div className="flex items-center gap-1 text-xs text-red-500 bg-red-50
                     px-2 py-1 rounded-md border border-red-100">
                     <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

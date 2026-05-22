@@ -98,31 +98,47 @@ const Csignin = () => {
           Sign In
         </h2>
 
-        <div className="flex mb-6 rounded-lg overflow-hidden border border-gray-200">
-          <button
-            type="button"
-            onClick={() => setActiveTab("client")}
-            className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
-              activeTab === "client"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Client
-          </button>
+      <div className="flex mb-6 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+  <button
+    type="button"
+    onClick={() => setActiveTab("client")}
+    style={
+      activeTab === "client"
+        ? {
+            background:
+              "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+          }
+        : {}
+    }
+    className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
+      activeTab === "client"
+        ? "text-white"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    }`}
+  >
+    Client
+  </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("employee")}
-            className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
-              activeTab === "employee"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Employee
-          </button>
-        </div>
+  <button
+    type="button"
+    onClick={() => setActiveTab("employee")}
+    style={
+      activeTab === "employee"
+        ? {
+            background:
+              "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+          }
+        : {}
+    }
+    className={`w-1/2 py-2 text-center font-medium transition-all duration-200 ${
+      activeTab === "employee"
+        ? "text-white"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    }`}
+  >
+    Employee
+  </button>
+</div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -174,6 +190,7 @@ const Csignin = () => {
                 onClick={handleForgotPassword}
                 disabled={forgotLoading}
                 className="text-sm text-blue-500 hover:underline disabled:opacity-60"
+                
               >
                 {forgotLoading ? "Sending OTP..." : "Forgot Password?"}
               </button>
@@ -182,7 +199,11 @@ const Csignin = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md mt-4 hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition-all"
+             style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }} 
+            className="w-full  text-white font-semibold py-2 rounded-md mt-4 hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition-all"
           >
             Sign In
           </button>

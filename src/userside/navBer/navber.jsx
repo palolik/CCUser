@@ -76,8 +76,11 @@ const Navber = () => {
             ) : (
               <NavLink
                 to="/signin"
-                className="bg-blue-600 text-white text-sm px-5 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200 whitespace-nowrap font-medium shadow-sm"
-              >
+                className=" text-white hover:text-white text-sm px-5 py-2 rounded-xl hover:scale-105 transition-all duration-200 whitespace-nowrap font-medium shadow-sm"
+            style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }}  >
                 Sign In
               </NavLink>
             )}

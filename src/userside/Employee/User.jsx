@@ -84,7 +84,9 @@ const Euser = () => {
 
   return (
     <div className="px-4 lg:px-0">
-      <div className="w-full lg:w-[400px] lg:mt-2 p-4 lg:h-[85vh] border-b border-gray-100 bg-white rounded-md flex-shrink-0 overflow-hidden transition-all hover:shadow-xl flex flex-col">
+      <div className="w-full lg:w-[400px] lg:mt-2 p-4 lg:h-[85vh] 
+      border-b border-gray-100 bg-white rounded-md flex-shrink-0 
+      overflow-hidden transition-all hover:shadow-xl flex flex-col">
 
         {/* ── Header row — always visible, tapping toggles body on mobile ── */}
         <div

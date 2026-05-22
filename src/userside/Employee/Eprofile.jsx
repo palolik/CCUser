@@ -16,7 +16,7 @@ const EmployeeProfile = () => {
   const [error, setError] = useState(null);
 
 
-// Add this useEffect alongside your existing ones:
+
 useEffect(() => {
   if (!token) return;
 
@@ -27,8 +27,8 @@ useEffect(() => {
     }).catch(() => {});
   };
 
-  ping();                                    // ping immediately on mount
-  const interval = setInterval(ping, 60000); // then every 60 seconds
+  ping();                                    
+  const interval = setInterval(ping, 60000);
 
   return () => clearInterval(interval);      // cleanup on unmount
 }, [token]);
@@ -59,12 +59,12 @@ useEffect(() => {
   if (!employee) return <p>No employee found.</p>;
 
   return (
-    <div className="overflow-hidden h-100vm bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="overflow-hidden h-[70vm] bg-gradient-to-br from-slate-50 to-slate-100">
       <Navber employee={employee} />
-      <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start  h-screen">
+      <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start lg:justify-center  h-[70vm]">
         <Euser employee={employee} />
       
-        <Task userSpecialty={employee.rdep} eid={id} />
+        <Task  eid={id} />
       </div>
       <Footer />
     </div>

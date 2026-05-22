@@ -10,10 +10,10 @@ const statConfig = [
 ];
 
 const colorMap = {
-  blue:    { icon: "rgba(59,130,246,0.12)",  bar: "from-blue-500 to-blue-400",       text: "text-blue-500"    },
-  emerald: { icon: "rgba(16,185,129,0.12)",  bar: "from-emerald-500 to-emerald-400", text: "text-emerald-500" },
-  amber:   { icon: "rgba(245,158,11,0.12)",  bar: "from-amber-500 to-amber-400",     text: "text-amber-500"   },
-  purple:  { icon: "rgba(139,92,246,0.12)",  bar: "from-purple-500 to-purple-400",   text: "text-purple-500"  },
+  blue:    {      text: "text-blue-500"    },
+  emerald: { text: "text-emerald-500" },
+  amber:   {      text: "text-amber-500"   },
+  purple:  {   text: "text-purple-500"  },
 };
 
 const useCounter = (target, duration = 2000, delay = 0) => {
@@ -61,9 +61,12 @@ const StatCard = ({ label, rawValue, icon: Icon, color, trend, delay }) => {
         {/* Icon */}
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
-          style={{ background: c.icon }}
+          style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }} 
         >
-          <Icon className={`w-5 h-5 ${c.text}`} strokeWidth={2} />
+          <Icon className="w-5 h-5 text-white" strokeWidth={2} />
         </div>
 
         {/* Value */}

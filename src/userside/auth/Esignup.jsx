@@ -326,11 +326,14 @@ const subdepartmentData = {
             </select>
           </div>
 
-          {/* Submit */}
+         
           <button
             type="submit"
-            className="w-full py-3 bg-blue-500 text-white rounded-lg mt-4 hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200 font-medium"
-          >
+            className="w-full py-3  text-white rounded-lg mt-4 hover:scale-105 focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200 font-medium"
+          style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }}  >
             Sign Up
           </button>
         </form>

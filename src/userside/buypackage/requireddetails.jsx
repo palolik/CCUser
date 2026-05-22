@@ -243,7 +243,10 @@ const Requireddetails = () => {
                   </div>
 
                   {/* Express */}
-                  <div className="price-card bg-blue-600 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1 relative overflow-hidden">
+                  <div className="price-card  rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1 relative overflow-hidden" style={{
+    background:
+      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+  }}>
                     <div className="absolute top-2 right-2 bg-blue-500/40 text-white text-[8px] sm:text-[10px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full">Fast Track</div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1">
