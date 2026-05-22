@@ -82,7 +82,10 @@ const Cproject = ({ eid }) => {
     <div className="w-full flex  flex-col lg:flex-row gap-0 lg:gap-6 p-3 lg:p-6 lg:min-h-[85vh]">
 
       <div className="flex-1 ">
-        <Cchat selectedProjectId={selectedProjectId} />
+      <Cchat
+  selectedProjectId={selectedProjectId}
+  isChatTabActive={true}
+/>
       </div>
       <div className="w-full lg:w-[400px] xl:w-[440px] flex-shrink-0 flex flex-col rounded-md  border border-gray-100 bg-white  overflow-hidden">
 

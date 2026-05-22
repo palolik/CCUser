@@ -71,7 +71,7 @@ const AttachmentPreview = ({ attachments, isClient }) => {
   );
 };
 
-const Cchat = ({ selectedProjectId }) => {
+const Cchat = ({ selectedProjectId, isChatTabActive = true }) => {
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -92,7 +92,10 @@ const Cchat = ({ selectedProjectId }) => {
   const activeProjectRef = useRef(null);
   const socketRef = useRef(null);
   const prevMessageCountRef = useRef(0);
-
+const notificationAudioRef = useRef(null);
+const audioUnlockedRef = useRef(false);
+const isChatTabActiveRef = useRef(isChatTabActive);
+const isMobileChatOpenRef = useRef(isMobileChatOpen);
   const checkIfNearBottom = () => {
     const container = scrollContainerRef.current;
     if (!container) return true;
@@ -124,7 +127,65 @@ const Cchat = ({ selectedProjectId }) => {
     }
   }, []);
 
-  // Clear old chat immediately when switching projects
+  useEffect(() => {
+  notificationAudioRef.current = new Audio("/assets/audio/pop.mp3");
+  notificationAudioRef.current.volume = 0.7;
+}, []);
+
+useEffect(() => {
+  isChatTabActiveRef.current = isChatTabActive;
+}, [isChatTabActive]);
+
+useEffect(() => {
+  isMobileChatOpenRef.current = isMobileChatOpen;
+}, [isMobileChatOpen]);
+
+useEffect(() => {
+  const unlockAudio = () => {
+    const audio = notificationAudioRef.current;
+    if (!audio || audioUnlockedRef.current) return;
+
+    audio
+      .play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audioUnlockedRef.current = true;
+      })
+      .catch(() => {
+        // Browser may block until user interacts
+      });
+  };
+
+  window.addEventListener("click", unlockAudio);
+  window.addEventListener("keydown", unlockAudio);
+
+  return () => {
+    window.removeEventListener("click", unlockAudio);
+    window.removeEventListener("keydown", unlockAudio);
+  };
+}, []);
+
+const playNotificationSound = () => {
+  const audio = notificationAudioRef.current;
+  if (!audio) return;
+
+  audio.currentTime = 0;
+  audio.play().catch((err) => {
+    console.log("Notification sound blocked:", err.message);
+  });
+};
+
+const shouldPlayNotification = () => {
+  const browserTabHidden = document.hidden;
+
+  const isMobileScreen = window.innerWidth < 1024;
+  const mobileChatClosed = isMobileScreen && !isMobileChatOpenRef.current;
+
+  const notOnChatTab = !isChatTabActiveRef.current;
+
+  return browserTabHidden || mobileChatClosed || notOnChatTab;
+};
   useEffect(() => {
     activeProjectRef.current = selectedProjectId || null;
     setMessages([]);
@@ -138,7 +199,7 @@ const Cchat = ({ selectedProjectId }) => {
     }
   }, [selectedProjectId, markMessagesRead]);
 
-  // Only auto-scroll when a NEW message arrives and user is near the bottom
+
   useEffect(() => {
     const isNewMessage = messages.length > prevMessageCountRef.current;
     prevMessageCountRef.current = messages.length;
@@ -214,7 +275,10 @@ const Cchat = ({ selectedProjectId }) => {
       socketRef.current.close();
     }
 
-    const newSocket = new WebSocket(`${chat_url}?orderId=${projectId}`);
+    // const newSocket = new WebSocket(`${chat_url}?orderId=${projectId}`);
+    const newSocket = new WebSocket(
+  `${chat_url}?orderId=${projectId}&userId=${user?.userId || user?.id || user?._id}`
+);
     socketRef.current = newSocket;
     setSocket(newSocket);
 
@@ -239,15 +303,28 @@ const Cchat = ({ selectedProjectId }) => {
         return;
       }
 
-      // Mark manager's message as read immediately if chat is open
-      if (data.sender === "manager") markMessagesRead(projectId);
+     const isIncomingMessage = data.sender === "manager";
 
-      setMessages((prevMessages) => {
-        if (!prevMessages.some(msg => msg.time === data.time && msg.text === data.text)) {
-          return [...prevMessages, data];
-        }
-        return prevMessages;
-      });
+if (isIncomingMessage && shouldPlayNotification()) {
+  playNotificationSound();
+}
+
+// Mark manager's message as read only if chat is actually visible
+if (isIncomingMessage && !shouldPlayNotification()) {
+  markMessagesRead(projectId);
+}
+
+setMessages((prevMessages) => {
+  const alreadyExists = prevMessages.some(
+    msg => msg.time === data.time && msg.text === data.text
+  );
+
+  if (!alreadyExists) {
+    return [...prevMessages, data];
+  }
+
+  return prevMessages;
+});
     };
 
     newSocket.onerror = (error) => console.error('WebSocket error:', error);
@@ -505,7 +582,6 @@ const Cchat = ({ selectedProjectId }) => {
 
   return (
     <>
-      {/* Desktop chat */}
       <div className="hidden lg:flex w-full h-full">
         {selectedProjectId ? (
           <div key={selectedProjectId} className="w-full h-full">
@@ -519,8 +595,6 @@ const Cchat = ({ selectedProjectId }) => {
           </div>
         )}
       </div>
-
-      {/* Mobile floating chat */}
       {selectedProjectId && (
         <div className="lg:hidden fixed bottom-4 right-4 z-[40]">
           <button

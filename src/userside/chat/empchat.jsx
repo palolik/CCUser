@@ -141,7 +141,10 @@ const Echat = ({ selectedTaskId }) => {
   useEffect(() => {
     if (!selectedTaskId) return;
 
-    const newSocket = new WebSocket(`${chat_url}?taskId=${selectedTaskId}`);
+    // const newSocket = new WebSocket(`${chat_url}?taskId=${selectedTaskId}`);
+    const newSocket = new WebSocket(
+  `${chat_url}?taskId=${taskId}&userId=${user?.userId || user?.id || user?._id}`
+);
     newSocket.onopen = () => console.log('Connected to WebSocket');
     newSocket.onmessage = (event) => {
       const data = JSON.parse(event.data);
