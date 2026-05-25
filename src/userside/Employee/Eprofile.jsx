@@ -30,7 +30,7 @@ useEffect(() => {
   ping();                                    
   const interval = setInterval(ping, 60000);
 
-  return () => clearInterval(interval);      // cleanup on unmount
+  return () => clearInterval(interval);      
 }, [token]);
   useEffect(() => {
     if (user === null) {

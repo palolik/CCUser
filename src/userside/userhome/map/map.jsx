@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPinCheck } from 'lucide-react';
+import AnimatedNetworkBackground from '../home/animatednetwork';
 
 const worldMap = '/assets/world.svg';
 
@@ -45,7 +46,7 @@ const Map = ({ mapData }) => {
         className="absolute -top-16 left-1/2 -translate-x-1/2 w-[800px] h-96 pointer-events-none"
         style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)" }}
       />
-
+<AnimatedNetworkBackground/>
       {/* Header */}
       <div className="text-center mb-14 px-6 relative">
         <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">

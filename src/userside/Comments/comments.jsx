@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
 import { base_url } from '../../config/config.jsx';
+import cicon from '/assets/aicon.png';
 
-const Avatar = ({ name, size = "md" }) => {
-  const initials = name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "?";
-  const colors = ["bg-violet-500","bg-blue-500","bg-emerald-500","bg-rose-500","bg-amber-500","bg-cyan-500","bg-fuchsia-500"];
-  const color = colors[name?.charCodeAt(0) % colors.length] || colors[0];
-  const sz = size === "sm" ? "w-7 h-7 text-[10px]" : "w-9 h-9 text-xs";
-  return (
-    <div className={`${sz} ${color} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 select-none`}>
-      {initials}
-    </div>
-  );
-};
 
 const TimeAgo = ({ date }) => {
   const d = new Date(date);
@@ -107,7 +97,7 @@ const Comments = ({ productId }) => {
       {/* Compose Box */}
       <div className="mb-6 sm:mb-8">
         <div className="flex gap-3">
-          <Avatar name="Guest User" />
+          <img src={cicon} className="h-10 w-10 rounded-full border border-blue-200"/>
           <div className="flex-1">
             <textarea
               className="w-full border border-slate-200 rounded-xl p-3 text-sm text-slate-700 placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all leading-relaxed min-h-[80px]"
@@ -161,7 +151,7 @@ const Comments = ({ productId }) => {
             <div key={comment._id}>
               {/* Comment */}
               <div className="flex gap-3">
-                <Avatar name={comment.userName} />
+          <img src={cicon} className="h-10 w-10 rounded-full border border-blue-200"/>
                 <div className="flex-1 min-w-0">
                   <div className="bg-slate-50 rounded-xl px-4 py-3">
                     <div className="flex items-baseline gap-2 mb-1 flex-wrap">
@@ -238,7 +228,7 @@ const Comments = ({ productId }) => {
                     <div className="mt-3 space-y-3 border-l-2 border-slate-100 pl-3 sm:pl-4">
                       {comment.replies.map((reply) => (
                         <div key={reply._id} className="flex gap-2.5">
-                          <Avatar name={reply.userName} size="sm" />
+          <img src={cicon} className="h-10 w-10 rounded-full border border-blue-200"/>
                           <div className="flex-1 min-w-0">
                             <div className="bg-slate-50 rounded-xl px-3 py-2.5">
                               <div className="flex items-baseline gap-2 mb-1 flex-wrap">

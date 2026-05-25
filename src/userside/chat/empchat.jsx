@@ -138,43 +138,49 @@ const Echat = ({ selectedTaskId }) => {
   }, [selectedTaskId]);
 
   /* websocket */
-  useEffect(() => {
-    if (!selectedTaskId) return;
+ /* websocket */
+useEffect(() => {
+  if (!selectedTaskId) return;
 
-    // const newSocket = new WebSocket(`${chat_url}?taskId=${selectedTaskId}`);
-    const newSocket = new WebSocket(
-  `${chat_url}?taskId=${taskId}&userId=${user?.userId || user?.id || user?._id}`
-);
-    newSocket.onopen = () => console.log('Connected to WebSocket');
-    newSocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+  const currentUserId = user?.userId || user?.id || user?._id;
 
-      // ✅ Ignore initial array dump
-      if (Array.isArray(data)) return;
+  const newSocket = new WebSocket(
+    `${chat_url}?taskId=${selectedTaskId}&userId=${currentUserId || ''}`
+  );
 
-      // ✅ Handle read_update — manager has seen employee's messages
-      if (data.type === 'read_update') {
-        setMessages(prev =>
-          prev.map(m => m.sender === data.sender ? { ...m, read: true } : m)
-        );
-        return;
+  newSocket.onopen = () => console.log('Connected to WebSocket');
+
+  newSocket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (Array.isArray(data)) return;
+
+    if (data.type === 'read_update') {
+      setMessages(prev =>
+        prev.map(m =>
+          m.sender === data.sender ? { ...m, read: true } : m
+        )
+      );
+      return;
+    }
+
+    if (data.sender === 'manager') markMessagesRead();
+
+    setMessages(prev => {
+      if (!prev.some(msg => msg.time === data.time && msg.text === data.text)) {
+        return [...prev, data];
       }
+      return prev;
+    });
+  };
 
-      // ✅ Mark manager's message as read immediately (chat is always open)
-      if (data.sender === 'manager') markMessagesRead();
+  newSocket.onerror = (error) => console.error('WebSocket error:', error);
+  newSocket.onclose = () => console.log('WebSocket disconnected');
 
-      setMessages(prev => {
-        if (!prev.some(msg => msg.time === data.time && msg.text === data.text)) {
-          return [...prev, data];
-        }
-        return prev;
-      });
-    };
-    newSocket.onerror = (error) => console.error('WebSocket error:', error);
-    newSocket.onclose = () => console.log('WebSocket disconnected');
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, [selectedTaskId]);
+  setSocket(newSocket);
+
+  return () => newSocket.close();
+}, [selectedTaskId, user?.userId, user?.id, user?._id]);
 
   const removeAttachedFile = (index) => {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));

@@ -103,37 +103,53 @@ const SupportChat = ({ forceOpen = false }) => {
     }
   };
 
-  useEffect(() => {
-    if (!supportId || isSessionClosed) return;
+ useEffect(() => {
+  if (!supportId || isSessionClosed) return;
 
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 1000);
+  fetchMessages();
 
-    const newSocket = new WebSocket(`${chat_url}?supportId=${supportId}`);
-    socketRef.current = newSocket;
-    newSocket.onopen = () => console.log("Support chat WebSocket connected");
-    newSocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+  const newSocket = new WebSocket(`${chat_url}?supportId=${supportId}&userId=${supportId}`);
+  socketRef.current = newSocket;
 
-      if (Array.isArray(data)) return;
+  newSocket.onopen = () => console.log("Support chat WebSocket connected");
 
-      setMessages((prev) => {
-        if (!prev.some((msg) => msg.time === data.time && msg.text === data.text)) {
-          return [...prev, data];
-        }
-        return prev;
+  newSocket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (Array.isArray(data)) {
+      setMessages(data);
+      return;
+    }
+
+    setMessages((prev) => {
+      const alreadyExists = prev.some((msg) => {
+        if (msg._id && data._id) return msg._id === data._id;
+
+        return (
+          String(msg.time) === String(data.time) &&
+          msg.text === data.text &&
+          msg.sender === data.sender
+        );
       });
 
-      if (isOpenRef.current && data.sender === "manager") markMessagesRead();
-    };
-    newSocket.onclose = () => console.log("Support chat WebSocket closed");
+      if (alreadyExists) return prev;
 
-    setSocket(newSocket);
-    return () => {
-      newSocket.close();
-      clearInterval(interval);
-    };
-  }, [supportId, isSessionClosed]);
+      return [...prev, data];
+    });
+
+    if (isOpenRef.current && data.sender === "manager") {
+      markMessagesRead();
+    }
+  };
+
+  newSocket.onclose = () => console.log("Support chat WebSocket closed");
+
+  setSocket(newSocket);
+
+  return () => {
+    newSocket.close();
+  };
+}, [supportId, isSessionClosed]);
 
   const handleCloseChatSession = () => {
     localStorage.setItem("supportChatClosed", "true");
@@ -160,39 +176,43 @@ const SupportChat = ({ forceOpen = false }) => {
     setIsOpen(true);
   };
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || !supportId || isSending || isSessionClosed) return;
+const handleSendMessage = async () => {
+  if (!inputValue.trim() || !supportId || isSending || isSessionClosed) return;
 
-    const message = {
-      supportId,
-      bId: userInfo.email,
-      bName: userInfo.name,
-      text: inputValue,
-      time: new Date(),
-      sender: "user",
-      read: false,
-    };
-
-    setIsSending(true);
-    try {
-      await fetch(`${base_url}/addschat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(message),
-      });
-
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(message));
-      }
-
-      setMessages((prev) => [...prev, message]);
-      setInputValue("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setIsSending(false);
-    }
+  const message = {
+    supportId,
+    bId: userInfo.email,
+    bName: userInfo.name,
+    text: inputValue.trim(),
+    time: new Date().toISOString(),
+    sender: "user",
+    read: false,
   };
+
+  setIsSending(true);
+
+  try {
+    const response = await fetch(`${base_url}/addschat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(message),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to send message");
+    }
+
+    // Do NOT socket.send here.
+    // Do NOT setMessages here.
+    // Backend will broadcast the saved message through WebSocket.
+
+    setInputValue("");
+  } catch (error) {
+    console.error("Error sending message:", error);
+  } finally {
+    setIsSending(false);
+  }
+};
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -211,8 +231,8 @@ const SupportChat = ({ forceOpen = false }) => {
       {!isOpen && !isSessionClosed && (
         <button
           onClick={() => setIsOpen(true)}
-          className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
-        >
+          className="hidden md:flex  text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
+        style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}  >
           <MessageCircle size={24} />
         </button>
       )}
@@ -220,8 +240,8 @@ const SupportChat = ({ forceOpen = false }) => {
       {!isOpen && isSessionClosed && (
         <button
           onClick={handleStartNewChat}
-          className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
-        >
+          className="hidden md:flex text-white p-4 rounded-full shadow-lg transition-all duration-300 items-center justify-center"
+        style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}  >
           <MessageCircle size={24} />
         </button>
       )}
@@ -229,7 +249,7 @@ const SupportChat = ({ forceOpen = false }) => {
       {isOpen && (
         <div className="w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col animate-fadeIn">
           {/* Header */}
-          <div className="flex justify-between items-center px-4 py-3 border-b bg-blue-600 text-white">
+          <div className="flex justify-between items-center px-4 py-3 border-b  text-white"   style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}>
             <div className="flex flex-col">
               <span className="font-semibold">Support Chat</span>
               {isFormSubmitted && (
@@ -248,7 +268,7 @@ const SupportChat = ({ forceOpen = false }) => {
                 onClick={handleCloseChatSession}
                 className="w-full border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm font-medium transition-all"
               >
-                Close chat session permanently
+                Closesession permanently
               </button>
             </div>
           )}
@@ -272,8 +292,8 @@ const SupportChat = ({ forceOpen = false }) => {
               />
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-all"
-              >
+                className="w-full text-white py-2 rounded-lg text-sm font-medium transition-all"
+              style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}  >
                 Start Chat
               </button>
             </form>
@@ -327,6 +347,7 @@ const SupportChat = ({ forceOpen = false }) => {
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim() || isSending}
+                    style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}
                   className={`px-4 py-2 rounded-r-md text-white text-sm font-medium ${
                     !inputValue.trim() || isSending ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
                   }`}

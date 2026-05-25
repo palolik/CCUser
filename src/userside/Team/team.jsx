@@ -125,7 +125,6 @@ const Team = () => {
                       >
                         {getInitials(member.name)}
                       </div>
-                      <span className="absolute bottom-1 right-1 w-3 h-3 rounded-full bg-green-400 border-2 border-white" />
                     </div>
 
                     <h3 className="text-sm font-medium text-gray-900 mb-1.5 leading-snug">{member.name}</h3>

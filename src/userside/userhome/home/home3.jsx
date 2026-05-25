@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import background  from "/assets/back/2.svg";  // viewBox 750×500 (landscape/wide)
+import background from "/assets/back/2.svg";  // viewBox 750×500 (landscape/wide)
 import background2 from "/assets/back/3.svg";  // viewBox 500×500 (square)
 import background3 from "/assets/back/4.svg";  // viewBox 500×500 (square)
 import AnimatedNetworkBackground from "./animatednetwork";
+import { NavLink } from "react-router-dom";
+
 const slides = [
   {
     title: ["Your Gateway to the", "Online Business World"],
@@ -28,8 +30,8 @@ const slides = [
 ];
 
 const Home3 = () => {
-  const [current, setCurrent]   = useState(0);
-  const [visible, setVisible]   = useState(true);
+  const [current, setCurrent] = useState(0);
+  const [visible, setVisible] = useState(true);
   const timerRef = useRef(null);
 
   const goTo = (idx) => {
@@ -50,23 +52,23 @@ const Home3 = () => {
   const s = slides[current];
 
   return (
-<section
-  className="relative w-full min-h-screen flex overflow-hidden"
-  style={{
-    background:
-      "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
-  }}
->
-  <AnimatedNetworkBackground />
+    <section
+      className="relative w-full min-h-screen flex overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
+      }}
+    >
+      <AnimatedNetworkBackground />
 
-  {/* Background glow */}
-  <div
-    className="absolute top-0 left-1/3 w-[600px] h-[500px] pointer-events-none z-[1]"
-    style={{
-      background:
-        "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)",
-    }}
-  />
+      {/* Background glow */}
+      <div
+        className="absolute top-0 left-1/3 w-[600px] h-[500px] pointer-events-none z-[1]"
+        style={{
+          background:
+            "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)",
+        }}
+      />
 
       {/* ── LEFT: Text (always 55% on desktop, full on mobile) ── */}
       <div className="relative z-10 flex flex-col justify-center
@@ -99,25 +101,21 @@ const Home3 = () => {
         {/* CTAs */}
         <div className={`flex flex-wrap gap-4
           transition-all duration-500 delay-150 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          <button className="border border-blue-400/30 hover:border-blue-400 text-blue-400
-            hover:bg-blue-500/10 font-light text-sm px-4 py-2  lg:px-8 lg:py-3.5 rounded-full transition-all duration-200">
-            Get Started
-          </button>
-          <button className="border border-blue-400/30 hover:border-blue-400 text-blue-400
+
+          <NavLink to="/portfolio" className="border border-blue-400/30 hover:border-blue-400 text-blue-400
             hover:bg-blue-500/10 font-light text-sm px-4 py-2  lg:px-8 lg:py-3.5 rounded-full transition-all duration-200">
             View Portfolio
-          </button>
+          </NavLink>
         </div>
 
         {/* Slide dots */}
         <div className="flex gap-2 mt-16">
           {slides.map((_, i) => (
             <button key={i} onClick={() => { clearInterval(timerRef.current); goTo(i); }}
-              className={`h-2 rounded-full transition-all duration-300 border-none cursor-pointer ${
-                i === current
+              className={`h-2 rounded-full transition-all duration-300 border-none cursor-pointer ${i === current
                   ? "w-6 bg-blue-500"
                   : "w-2 bg-white/20 hover:bg-white/40"
-              }`} />
+                }`} />
           ))}
         </div>
       </div>

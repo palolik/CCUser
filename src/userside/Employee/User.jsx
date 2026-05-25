@@ -16,8 +16,8 @@ const Euser = () => {
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [isEditing, setIsEditing]     = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
-  const [isOpen, setIsOpen]           = useState(false); // ← mobile collapse
-    const [iscOpen, setIscOpen]           = useState(true); // ← mobile collapse
+  const [isOpen, setIsOpen]           = useState(false); 
+    const [iscOpen, setIscOpen]           = useState(true);
 
   const [formData, setFormData]       = useState({
     rname: "", remail: "", rphone: "", country: "", password: "", dp: null,
