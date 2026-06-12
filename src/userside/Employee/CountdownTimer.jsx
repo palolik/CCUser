@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 
-const CountdownTimer = ({ targetDate }) => {
+const CountdownTimer = ({ targetDate, onExpire }) => {
     const [timeLeft, setTimeLeft] = useState({
         days: 0,
         hours: 0,
@@ -33,50 +33,54 @@ const CountdownTimer = ({ targetDate }) => {
             setTimeLeft(timeLeft);
 
             if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
-                clearInterval(countdownInterval); 
-                setIsTimeUp(true);// Stop the interval once the countdown reaches zero
+                clearInterval(countdownInterval);
+                setIsTimeUp(true);
             }
         }, 1000);
 
-        return () => clearInterval(countdownInterval); // Cleanup the interval on component unmount
+        return () => clearInterval(countdownInterval);
     }, [targetDate]);
-    // useEffect(() => {
-    //     if (isTimeUp) {
-    //         window.alert("Time is up, you were late to submit your work.");
-    //     }
-    // }, [isTimeUp]);
+
+    // Notify parent once when countdown hits zero
+    useEffect(() => {
+        if (isTimeUp) {
+            onExpire?.();
+        }
+    }, [isTimeUp]);
+
     return (
         <div>
-            <div className='font-bold m-2 text-lg'>Time remaining:</div>
+            <div className={`font-bold m-2 text-lg ${isTimeUp ? 'text-red-600' : ''}`}>
+                {isTimeUp ? 'Time is up!' : 'Time remaining:'}
+            </div>
             <div className='flex flex-row items-center justify-center'>
                 <div className="grid grid-flow-col lg:gap-5 text-center auto-cols-max mb-5">
-                    <div className="flex flex-col p-2 bg-white rounded-sm bordered text-black">
-                        <span className="countdown font-mono text-5xl bg-white text-black">
+                    <div className={`flex flex-col p-2 rounded-sm bordered ${isTimeUp ? 'bg-red-100 text-red-700' : 'bg-white text-black'}`}>
+                        <span className="countdown font-mono text-5xl">
                             <span style={{ "--value": timeLeft.days }}></span>
                         </span>
                         days
                     </div>
-                    <div className="flex flex-col p-2 bg-white rounded-sm bordered text-black">
-                        <span className="countdown font-mono text-5xl bg-white text-black">
+                    <div className={`flex flex-col p-2 rounded-sm bordered ${isTimeUp ? 'bg-red-100 text-red-700' : 'bg-white text-black'}`}>
+                        <span className="countdown font-mono text-5xl">
                             <span style={{ "--value": timeLeft.hours }}></span>
                         </span>
                         hours
                     </div>
-                    <div className="flex flex-col p-2 bg-white rounded-sm bordered text-black">
-                        <span className="countdown font-mono text-5xl bg-white text-black">
+                    <div className={`flex flex-col p-2 rounded-sm bordered ${isTimeUp ? 'bg-red-100 text-red-700' : 'bg-white text-black'}`}>
+                        <span className="countdown font-mono text-5xl">
                             <span style={{ "--value": timeLeft.minutes }}></span>
                         </span>
                         min
                     </div>
-                    <div className="flex flex-col p-2 bg-white rounded-sm bordered text-black">
-                        <span className="countdown font-mono text-5xl bg-white text-black">
+                    <div className={`flex flex-col p-2 rounded-sm bordered ${isTimeUp ? 'bg-red-100 text-red-700' : 'bg-white text-black'}`}>
+                        <span className="countdown font-mono text-5xl">
                             <span style={{ "--value": timeLeft.seconds }}></span>
                         </span>
                         sec
                     </div>
                 </div>
             </div>
-          
         </div>
     );
 };

@@ -8,12 +8,13 @@ import Echat from "../chat/empchat";
 import { AuthContext } from './../Provider/AuthProvider';
 import { base_url } from "../../config/config";
 import Placeholder from "./Placeholder";
+import LoadingSpinner from "../utils/loaderSpinner";
 const Task = () => {
   const { user } = useContext(AuthContext);
-
-  const loaderTasks = useLoaderData();
+const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);  
   const [selectedTaskId, setSelectedTaskId] = useState(null); 
+const [expiredTasks, setExpiredTasks] = useState(new Set());
 
 
 
@@ -21,15 +22,14 @@ useEffect(() => {
   const employeeId = user?.id || user?._id || user?.userId;
 
   if (!employeeId) {
-    console.log("Employee ID not found yet:", user);
     return;
   }
+
+  setLoading(true);
 
   fetch(`${base_url}/employee/tasks/can-do/${employeeId}`)
     .then(res => res.json())
     .then(data => {
-      console.log("Fetched my tasks:", data);
-
       if (data.success && Array.isArray(data.tasks)) {
         setTasks(data.tasks);
 
@@ -38,12 +38,14 @@ useEffect(() => {
         }
       } else {
         setTasks([]);
-        Swal.fire("Error", data.message || "Failed to load tasks.", "error");
       }
     })
     .catch(error => {
-      console.error("Error fetching my tasks:", error);
+      console.error(error);
       Swal.fire("Error", "An unexpected error occurred", "error");
+    })
+    .finally(() => {
+      setLoading(false);
     });
 }, [user]);
 // auto-select first task whenever tasks load
@@ -52,33 +54,40 @@ useEffect(() => {
     setSelectedTaskId(tasks[0]._id);
   }
 }, [tasks]);
-  const handleTaskComplete = (_id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, mark as completed!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`${base_url}/comptask/${_id}`, {
-          method: 'PUT',
-          headers: { "Content-Type": "application/json" },
-        })
-          .then(res => res.json())
-          .then(() => {
-            setTasks(prevTasks =>
-              prevTasks.map(task =>
-                task._id === _id ? { ...task, tstatus: "Completed" } : task
-              )
-            );
-            Swal.fire("Completed!", "Task has been marked as completed.", "success");
-          });
-      }
-    });
-  };
+const handleTaskComplete = (_id) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#002141",
+    cancelButtonColor: "rgb(255, 71, 71)",
+    confirmButtonText: "Request Verification!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+    fetch(`${base_url}/comptask/${_id}`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+})
+  .then(res => {
+    if (!res.ok) throw new Error("Failed to complete task");
+    return res.json();
+  })
+  .then(() => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task._id === _id ? { ...task, tstatus: "VerifyTask" } : task
+      )
+    );
+    Swal.fire("Completion Requested!", "Task is enlisted for Verification.", "success")
+      .then(() => window.location.reload());
+  })
+  .catch(() => {
+    Swal.fire("Error!", "Failed to complete task.", "error");
+  });
+    }
+  });
+};
 
   const handleFeedback = async (event, _id) => {
     event.preventDefault();
@@ -98,7 +107,9 @@ useEffect(() => {
       const data = await response.json();
 
       if (data.modifiedCount > 0) {
-        Swal.fire("Success", "Feedback Given!", "success");
+        Swal.fire("Success", "Feedback Given!", "success").then(() => {
+            window.location.reload();
+          });
         setTasks(prevTasks =>
           prevTasks.map(task =>
             task._id === _id
@@ -107,7 +118,13 @@ useEffect(() => {
           )
         );
       } else {
-        Swal.fire("Success", "Feedback Given!", "success");
+        Swal.fire(
+            "Completed!",
+            "Task has been marked as completed.",
+            "success"
+          ).then(() => {
+            window.location.reload();
+          });
       }
     } catch (error) {
       console.error("Error updating feedback:", error);
@@ -170,7 +187,9 @@ useEffect(() => {
               ));
             });
         } else {
-          Swal.fire("Accepted!", "Task has been accepted.", "success");
+          Swal.fire("Accepted!", "Task has been accepted.", "success").then(() => {
+            window.location.reload();
+          });
         }
       })
       .catch(error => {
@@ -182,6 +201,18 @@ useEffect(() => {
   const handleTaskClick = (taskId) => {
   setSelectedTaskId(taskId); 
 };
+const handleExpire = (taskId) => {
+  setExpiredTasks(prev => new Set(prev).add(taskId));
+};
+
+
+if (loading) {
+  return (
+    <div className="flex items-center justify-center h-[85vh]">
+<LoadingSpinner/>   </div>
+  );
+}
+
   return (
     <div >
    {tasks.length === 0 ? (
@@ -216,10 +247,13 @@ useEffect(() => {
               <div
                 key={task._id || index}
                 onClick={() => handleTaskClick(task._id)}
-                className={`transition-all duration-300 cursor-pointer rounded-md shadow-md hover:shadow-xl border ${selectedTaskId === task._id
-                    ? "border-blue-400 bg-blue-50/70"
-                    : "border-gray-100 bg-white"
-                  }`}
+                className={`transition-all duration-300 cursor-pointer rounded-md shadow-md hover:shadow-xl border ${
+  expiredTasks.has(task._id)
+    ? "border-red-300 bg-red-50/60"
+    : selectedTaskId === task._id
+    ? "border-blue-400 bg-blue-50/70"
+    : "border-gray-100 bg-white"
+  }`}
               >
                 <div className="flex flex-row justify-between items-start p-3 border-b border-gray-100">
                   <div>
@@ -259,26 +293,39 @@ useEffect(() => {
                           targetDate={
                             new Date(new Date(task.tat).getTime() + Number(task.ttime) * 60 * 60 * 1000)
                           }
-                        />
-
+                           onExpire={() => handleExpire(task._id)}
+ 
+/>
+                      
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleTaskComplete(task._id)}
-                          className="flex-1 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
-                        >
-                          Task Completed
-                        </button>
+                                          <button
+                      onClick={() => handleTaskComplete(task._id)}
+                      disabled={expiredTasks.has(task._id)}
+                      className={`flex-1 py-2 rounded-lg transition ${
+                        expiredTasks.has(task._id)
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                    >
+  Task Completed
+</button>
 
                         {task.tmoretime ? <button
                           disabled
                           className="flex-1 text-blue-500 py-2 border-blue-500 border rounded-lg  bg-white transition cursor-not-allowed">
-                          More Time Requested
+                          Time Requested
                         </button> : <button
-                          onClick={() =>
-                            handleMoretime(task._id)} className="flex-1 text-blue-500 py-2 border-blue-500 border rounded-lg hover:text-white bg-white  hover:bg-blue-600 transition">
-                          Request Time
-                        </button>}
+  onClick={() => handleMoretime(task._id)}
+  disabled={expiredTasks.has(task._id)}
+  className={`flex-1 text-blue-500 py-2 border-blue-500 border rounded-lg transition ${
+    expiredTasks.has(task._id)
+      ? "opacity-40 cursor-not-allowed"
+      : "bg-white hover:text-white hover:bg-blue-600"
+  }`}
+>
+  Request Time
+</button>}
 
                       </div>
                     </div>
@@ -303,7 +350,9 @@ useEffect(() => {
                       </button>
                     </form>
                   )}
-
+    {task.tstatus === "VerifyTask" && (
+                   <div>Task is Waiting for verification</div>
+                  )}
                   {task.tstatus === "pending" && (
                     <div className="flex gap-2">
                       <button
