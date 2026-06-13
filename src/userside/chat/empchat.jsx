@@ -275,9 +275,8 @@ useEffect(() => {
                         </div>
                       </div>
                       <div className="chat-header flex flex-row items-center">
-                        <p>{isEmp ? user?.rname : 'Manager'}</p>
                         <time className="text-xs opacity-50">
-                          {' '} - {new Date(msg.time).toLocaleTimeString()}
+                         {new Date(msg.time).toLocaleTimeString()}
                         </time>
                       </div>
                       <div className={`chat-bubble w-fit max-w-xs ${

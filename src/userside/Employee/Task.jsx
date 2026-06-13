@@ -15,27 +15,36 @@ const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);  
   const [selectedTaskId, setSelectedTaskId] = useState(null); 
 const [expiredTasks, setExpiredTasks] = useState(new Set());
+const [refreshing, setRefreshing] = useState(false);
 
-
-
-useEffect(() => {
+const handleRefresh = () => {
+  setRefreshing(true);
   const employeeId = user?.id || user?._id || user?.userId;
-
-  if (!employeeId) {
-    return;
-  }
-
-  setLoading(true);
+  if (!employeeId) return;
 
   fetch(`${base_url}/employee/tasks/can-do/${employeeId}`)
     .then(res => res.json())
     .then(data => {
       if (data.success && Array.isArray(data.tasks)) {
         setTasks(data.tasks);
+      } else {
+        setTasks([]);
+      }
+    })
+    .catch(() => Swal.fire("Error", "Failed to refresh tasks", "error"))
+    .finally(() => setRefreshing(false));
+};
+const fetchTasks = () => {
+  const employeeId = user?.id || user?._id || user?.userId;
+  if (!employeeId) return;
 
-        if (data.tasks.length > 0) {
-          setSelectedTaskId(data.tasks[0]._id);
-        }
+  setLoading(true);
+  fetch(`${base_url}/employee/tasks/can-do/${employeeId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.tasks)) {
+        setTasks(data.tasks);
+        if (data.tasks.length > 0) setSelectedTaskId(data.tasks[0]._id);
       } else {
         setTasks([]);
       }
@@ -44,11 +53,14 @@ useEffect(() => {
       console.error(error);
       Swal.fire("Error", "An unexpected error occurred", "error");
     })
-    .finally(() => {
-      setLoading(false);
-    });
+    .finally(() => setLoading(false));
+};
+
+useEffect(() => {
+  fetchTasks();
 }, [user]);
-// auto-select first task whenever tasks load
+
+
 useEffect(() => {
   if (tasks.length > 0 && !selectedTaskId) {
     setSelectedTaskId(tasks[0]._id);
@@ -65,26 +77,21 @@ const handleTaskComplete = (_id) => {
     confirmButtonText: "Request Verification!"
   }).then((result) => {
     if (result.isConfirmed) {
-    fetch(`${base_url}/comptask/${_id}`, {
-  method: "PUT",
-  headers: { "Content-Type": "application/json" },
-})
-  .then(res => {
-    if (!res.ok) throw new Error("Failed to complete task");
-    return res.json();
-  })
-  .then(() => {
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
-        task._id === _id ? { ...task, tstatus: "VerifyTask" } : task
-      )
-    );
-    Swal.fire("Completion Requested!", "Task is enlisted for Verification.", "success")
-      .then(() => window.location.reload());
-  })
-  .catch(() => {
-    Swal.fire("Error!", "Failed to complete task.", "error");
-  });
+      fetch(`${base_url}/comptask/${_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to complete task");
+          return res.json();
+        })
+        .then(() => {
+          Swal.fire("Completion Requested!", "Task is enlisted for Verification.", "success")
+            .then(() => fetchTasks());
+        })
+        .catch(() => {
+          Swal.fire("Error!", "Failed to complete task.", "error");
+        });
     }
   });
 };
@@ -107,9 +114,8 @@ const handleTaskComplete = (_id) => {
       const data = await response.json();
 
       if (data.modifiedCount > 0) {
-        Swal.fire("Success", "Feedback Given!", "success").then(() => {
-            window.location.reload();
-          });
+        Swal.fire("Success", "Feedback Given!", "success").then(() => fetchTasks());
+
         setTasks(prevTasks =>
           prevTasks.map(task =>
             task._id === _id
@@ -122,9 +128,7 @@ const handleTaskComplete = (_id) => {
             "Completed!",
             "Task has been marked as completed.",
             "success"
-          ).then(() => {
-            window.location.reload();
-          });
+          ).then(() => fetchTasks());
       }
     } catch (error) {
       console.error("Error updating feedback:", error);
@@ -187,9 +191,8 @@ const handleTaskComplete = (_id) => {
               ));
             });
         } else {
-          Swal.fire("Accepted!", "Task has been accepted.", "success").then(() => {
-            window.location.reload();
-          });
+          Swal.fire("Accepted!", "Task has been accepted.", "success").then(() => fetchTasks());
+
         }
       })
       .catch(error => {
@@ -203,6 +206,12 @@ const handleTaskComplete = (_id) => {
 };
 const handleExpire = (taskId) => {
   setExpiredTasks(prev => new Set(prev).add(taskId));
+
+  // Notify backend
+  fetch(`${base_url}/timeranout/${taskId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  }).catch(err => console.error("Failed to mark time ran out:", err));
 };
 
 
@@ -225,12 +234,28 @@ if (loading) {
   </div>
 
       <div className="lg:w-[400px] w-full lg:h-[85vh] bg-white backdrop-blur-lg  p-2  rounded-md  flex flex-col">
-        <div className="text-xl font-semibold text-gray-800 border-b pb-1 mb-4 flex items-center justify-between">
-          <span> My Tasks</span>
-          <span className="text-sm font-medium text-gray-500">
-            {tasks.length} {tasks.length === 1 ? "Task" : "Tasks"}
-          </span>
-        </div>
+       <div className="text-xl font-semibold text-gray-800 border-b pb-1 mb-4 flex items-center justify-between">
+  <span>My Tasks</span>
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium text-gray-500">
+      {tasks.length} {tasks.length === 1 ? "Task" : "Tasks"}
+    </span>
+    <button
+      onClick={handleRefresh}
+      className="p-1 rounded-full hover:bg-gray-100 transition text-gray-500 hover:text-blue-500"
+      title="Refresh tasks"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
+  </div>
+</div>
         <div
           className="flex-1 overflow-y-auto space-y-4 pr-1"
           style={{
