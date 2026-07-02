@@ -25,7 +25,11 @@ const ESignUp = () => {
  const departmentData = [
   {
     department: "Web Development",
-    subDepartments: ["Frontend", "Backend", "Full Stack", "CMS Development"],
+    subDepartments: [
+      "Frontend",
+       "Backend", 
+       "Full Stack",
+       "CMS Development"],
   },
   {
     department: "Graphic Design",
@@ -165,6 +169,7 @@ const subdepartmentData = {
       rppic:
         "https://p1.hiclipart.com/preview/359/957/100/face-icon-user-profile-user-account-avatar-icon-design-head-silhouette-neck-png-clipart.jpg",
       role: "emp",
+      isReady: false,
       rname: form.rname.value.trim(),
       remail: form.remail.value.trim(),
       rphone: form.rphone.value.trim(),

@@ -63,7 +63,6 @@ const Footer = () => {
 
           {[
             { label: "About Us", to: "/aboutus" },
-            { label: "Support", to: "/" },
             { label: "Terms & Conditions", to: "/termsandcondition" },
             { label: "Privacy Policy", to: "/privacypolicy" },
             { label: "Career", to: "/career" },
@@ -87,7 +86,7 @@ const Footer = () => {
           {[
             { label: "Affiliate", to: "/" },
             { label: "Our Team", to: "/ourteam" },
-            { label: "Employee Login", to: "/employeesignin" },
+            { label: "Employee Login", to: "/signin" },
           ].map(({ label, to }) => (
             <NavLink
               key={label}

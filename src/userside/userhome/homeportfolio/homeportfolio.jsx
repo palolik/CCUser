@@ -152,7 +152,6 @@ const HomePortfolio = () => {
 
         {!loading && filtered.length === 0 && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-5">📂</div>
             <h3 className="font-serif text-2xl font-semibold text-gray-700 mb-2"
               style={{ fontFamily: "'Playfair Display', serif" }}>No projects found</h3>
             <p className="text-gray-400 font-light">
