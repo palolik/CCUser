@@ -8,7 +8,7 @@ const Csignin = () => {
   const [remail, setEmail] = useState("");
   const [rpass, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState(""); // 👈 nothing selected initially
+  const [activeTab, setActiveTab] = useState(""); 
   const [showPassword, setShowPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
 

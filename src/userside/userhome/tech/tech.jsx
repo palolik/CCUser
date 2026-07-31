@@ -1,32 +1,35 @@
-// ── asset imports (fixed typos) ──────────────────────────────────────────────
+// ── asset imports ─────────────────────────────────────────────────────────────
 const ai        = '/assets/ai.png';
 const ps        = '/assets/ps.png';
 const id        = '/assets/id.png';
 const figma     = '/assets/figma.png';
 const xd        = '/assets/xd.png';
-const vue       = '/assets/vue.png';      // was: veu
-const ruby      = '/assets/rubi.png';     // was: rubi (label fix too)
-const angular   = '/assets/angular.png';
-const aws       = '/assets/aws.png';
-const bootstrap = '/assets/bootstrap.png';
-const flutter   = '/assets/flutter.png';
-const java      = '/assets/java.png';
-const js        = '/assets/js.png';
-const kotlin    = '/assets/kotlin.png';
-const laravel   = '/assets/laravel.png';
-const net       = '/assets/net.png';
-const node      = '/assets/node.png';
-const php       = '/assets/php.png';
-const react     = '/assets/re.png';
-const tailwind  = '/assets/tailwind.png'; // was: tail
-const swift     = '/assets/swift.png';
-const codeigniter = '/assets/agun.png';
-const fire      = '/assets/fire.png';
+
 const acd       = '/assets/Autocad.png';
-const blender   = '/assets/Blender.png'; // was: bldr
+const blender   = '/assets/Blender.png';
 const maya      = '/assets/maya.png';
 const revit     = '/assets/Revit.png';
 const sketchup  = '/assets/Sketchup.png';
+
+const react     = '/assets/re.png';
+const vue       = '/assets/vue.png';
+const angular   = '/assets/angular.png';
+const tailwind  = '/assets/tailwind.png';
+const bootstrap = '/assets/bootstrap.png';
+const js        = '/assets/js.png';
+
+const node      = '/assets/node.png';
+const php       = '/assets/php.png';
+const laravel   = '/assets/laravel.png';
+const ruby      = '/assets/rubi.png';
+const net       = '/assets/net.png';
+const codeigniter = '/assets/agun.png';
+
+const flutter   = '/assets/flutter.png';
+const java      = '/assets/java.png';
+const kotlin    = '/assets/kotlin.png';
+const swift     = '/assets/swift.png';
+
 
 // ── data ─────────────────────────────────────────────────────────────────────
 const sections = [
@@ -34,86 +37,101 @@ const sections = [
     num: '01',
     title: 'Graphic Design',
     items: [
-      { src: ai,     label: 'Illustrator' },
-      { src: ps,     label: 'Photoshop'   },
-      { src: id,     label: 'InDesign'    },
-      { src: xd,     label: 'Adobe XD'    }, // was: AdobeXD
-      { src: figma,  label: 'Figma'       },
+      { src: ai, label: 'Illustrator' },
+      { src: ps, label: 'Photoshop' },
+      { src: id, label: 'InDesign' },
     ],
   },
   {
     num: '02',
-    title: '3D Design',
+    title: 'UI/UX Design',
     items: [
-      { src: acd,      label: 'AutoCAD'   }, // was: AutoCad
-      { src: blender,  label: 'Blender'   },
-      { src: sketchup, label: 'SketchUp'  },
-      { src: maya,     label: 'Maya'      },
-      { src: revit,    label: 'Revit'     },
+      { src: figma, label: 'Figma' },
+      { src: xd, label: 'Adobe XD' },
     ],
   },
   {
     num: '03',
-    title: 'Web Frontend',
+    title: '3D / CAD / BIM',
     items: [
-      { src: react,     label: 'React'      },
-      { src: vue,       label: 'Vue.js'     }, // was: VueJS
-      { src: angular,   label: 'Angular'    },
-      { src: tailwind,  label: 'Tailwind'   },
-      { src: bootstrap, label: 'Bootstrap'  },
-      { src: js,        label: 'JavaScript' }, // was: JS
+      { src: acd, label: 'AutoCAD' },
+      { src: blender, label: 'Blender' },
+      { src: sketchup, label: 'SketchUp' },
+      { src: maya, label: 'Maya' },
+      { src: revit, label: 'Revit' },
     ],
   },
   {
     num: '04',
+    title: 'Web Frontend',
+    items: [
+      { src: react, label: 'React' },
+      { src: vue, label: 'Vue.js' },
+      { src: angular, label: 'Angular' },
+      { src: tailwind, label: 'Tailwind CSS' },
+      { src: bootstrap, label: 'Bootstrap' },
+      { src: js, label: 'JavaScript' },
+    ],
+  },
+
+  {
+    num: '05',
     title: 'Web Backend',
     items: [
-      { src: node,        label: 'Node.js'     }, // was: NodeJS
-      { src: php,         label: 'PHP'         },
-      { src: laravel,     label: 'Laravel'     },
-      { src: ruby,        label: 'Ruby'        }, // was: Rubi
-      { src: net,         label: '.NET'        }, // was: .Net
+      { src: node, label: 'Node.js' },
+      { src: php, label: 'PHP' },
+      { src: laravel, label: 'Laravel' },
+      { src: ruby, label: 'Ruby on Rails' },
+      { src: net, label: 'ASP.NET / .NET' },
       { src: codeigniter, label: 'CodeIgniter' },
     ],
   },
   {
-    num: '05',
+    num: '06',
     title: 'App Development',
     items: [
-      { src: react,   label: 'React Native' },
-      { src: flutter, label: 'Flutter'      },
-      { src: java,    label: 'Java'         },
-      { src: kotlin,  label: 'Kotlin'       },
-      { src: swift,   label: 'Swift'        },
+      { src: react, label: 'React Native' },
+      { src: flutter, label: 'Flutter' },
+      { src: java, label: 'Java' },
+      { src: kotlin, label: 'Kotlin' },
+      { src: swift, label: 'Swift' },
     ],
   },
 ];
 
-// ── component ─────────────────────────────────────────────────────────────────
+
 const Tech = () => {
   return (
     <section className="py-24 px-6 bg-gray-50">
 
-      {/* Header */}
       <div className="text-center mb-16">
-        <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">Our Stack</p>
-        <h2 className="font-serif text-4xl md:text-5xl font-semibold text-gray-900 leading-tight"
-          style={{ fontFamily: "'Playfair Display', serif" }}>
+        <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">
+          Our Stack
+        </p>
+
+        <h2
+          className="font-serif text-4xl md:text-5xl font-semibold text-gray-900 leading-tight"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
           Technologies <em className="italic text-blue-500">We Use</em>
         </h2>
       </div>
 
-      {/* Rows */}
       <div className="flex flex-col gap-3 max-w-7xl mx-auto">
-        {sections.map((section, idx) => (
-          <div key={idx}
-            className="group  rounded-2xl px-3 py-2 lg:px-7 lg:py-5 flex flex-col md:flex-row md:items-center gap-5 hover:border-blue-200 hover:shadow-xl transition-all duration-300"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
+        {sections.map((section) => (
+          <div
+            key={section.title}
+            className=" lg:px-7 lg:py-5 flex flex-col md:flex-row md:items-center gap-5 hover:border-blue-200 hover:shadow-xl transition-all duration-300"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}
+          >
 
-            {/* Category label */}
-            <div className="md:w-36 flex-shrink-0">
-              <p className="text-xs text-gray-300 font-light mb-0.5">{section.num}</p>
-              <p className="text-sm font-medium text-gray-700">{section.title}</p>
+            <div className="md:w-40 flex-shrink-0">
+              <p className="text-xs text-gray-300 font-light mb-0.5">
+                {section.num}
+              </p>
+              <p className="text-sm font-medium text-gray-700">
+                {section.title}
+              </p>
             </div>
 
             {/* Divider */}
@@ -132,6 +150,7 @@ const Tech = () => {
                 </div>
               ))}
             </div>
+
           </div>
         ))}
       </div>
