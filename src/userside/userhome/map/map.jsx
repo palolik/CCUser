@@ -41,10 +41,9 @@ const Map = ({ mapData }) => {
   className="relative py-24 overflow-hidden"
   style={{ background: "linear-gradient(160deg,#050d1f 0%,#0a1628 55%,#050d1f 100%)" }}
 >
-  {/* Network background — covers the entire section */}
-  <AnimatedNetworkBackground />
+ 
 
-  {/* Glow */}
+
   <div
     className="absolute -top-16 left-1/2 -translate-x-1/2 w-[800px] h-96 pointer-events-none z-0"
     style={{ background: "radial-gradient(ellipse,rgba(59,130,246,0.12) 0%,transparent 65%)" }}

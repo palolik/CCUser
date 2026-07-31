@@ -6,7 +6,7 @@
 
 import { Helmet } from 'react-helmet-async';
 
-const DEFAULT_TITLE = 'Cloud Company | Software Development & Digital Solutions Since 2019';
+const DEFAULT_TITLE = 'Cloud Company';
 const DEFAULT_DESCRIPTION =
   'Cloud Company helps businesses grow online with custom web development, app development, graphic design, social media marketing, and product design. Reliable tech since 2019.';
 const SITE_URL = 'https://cloudcompany.cc';

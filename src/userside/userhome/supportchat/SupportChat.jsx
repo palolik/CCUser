@@ -25,6 +25,16 @@ const SupportChat = ({ forceOpen = false }) => {
 
   // Sync ref with state
   useEffect(() => {
+  if (!isOpen || !isFormSubmitted) return;
+
+  requestAnimationFrame(() => {
+    chatEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  });
+}, [messages, isOpen, isFormSubmitted]);
+  useEffect(() => {
     isOpenRef.current = isOpen;
     // Mark manager messages as read when user opens the chat
     if (isOpen && supportId && !isSessionClosed) markMessagesRead();
@@ -266,16 +276,16 @@ const handleSendMessage = async () => {
               <button
                 type="button"
                 onClick={handleCloseChatSession}
-                className="w-full border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-lg text-sm font-medium transition-all"
+                className="w-full  text-red-500 hover:bg-red-50  rounded-lg text-sm font-medium transition-all"
               >
-                Closesession permanently
+                Close Session
               </button>
             </div>
           )}
 
           {!isFormSubmitted ? (
             <form onSubmit={handleFormSubmit} className="p-4 space-y-3">
-              <p className="text-gray-600 text-sm">Please enter your details before starting chat:</p>
+              <p className="text-gray-600 text-sm">Please enter your name and email before starting chat:</p>
               <input
                 type="text"
                 placeholder="Your Name"
@@ -304,7 +314,7 @@ const handleSendMessage = async () => {
                 style={{ scrollbarWidth: "thin", scrollbarColor: "#93c5fd #f1f5f9", maxHeight: "60vh" }}
               >
                 {messages.length === 0 ? (
-                  <p className="text-center text-gray-500 text-sm pt-4">Start your conversation below 👋</p>
+                  <p className="text-center text-gray-500 text-sm pt-4">Start your conversation below</p>
                 ) : (
                   (() => {
                     const lastUserMsgIndex = messages.map(m => m.sender).lastIndexOf("user");

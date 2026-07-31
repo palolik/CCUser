@@ -195,7 +195,7 @@ const Viewer = () => {
   return (
     <div className="overflow-x-hidden w-full">
       <SeoHead
-        title="Software Development & Digital Solutions Since 2019"
+        title="Cloud Company"
         description="Cloud Company helps businesses grow online with custom web development, app development, graphic design, social media marketing, and product design. Reliable tech since 2019."
         canonical="/"
         ogType="website"
