@@ -7,6 +7,7 @@ import Cuser from "./CUser";
 import Cproject from "./Cprojects";
 import { base_url } from "../../config/config";
 import LoadingSpinner from "../utils/loaderSpinner";
+import SeoHead from "../../Seohead";
 
 const ClientProfile = () => {
   const { id } = useParams();
@@ -68,6 +69,7 @@ const ClientProfile = () => {
 
   return (
     <div className="overflow-hidden h-100vm  bg-gradient-to-br from-slate-50 to-slate-100">
+      <SeoHead title="Client Profile" noIndex />
       <Navber employee={employee} />
       <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start h-screen">
         <Cuser employee={employee} />

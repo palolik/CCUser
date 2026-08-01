@@ -19,9 +19,11 @@ const SeoHead = ({
   ogImage = OG_IMAGE,
   ogType = 'website',
   noIndex = false,
+  jsonLd,
 }) => {
   const fullTitle = title ? `${title} | Cloud Company` : DEFAULT_TITLE;
   const canonicalUrl = canonical ? `${SITE_URL}${canonical}` : SITE_URL;
+  const jsonLdList = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   return (
     <Helmet>
@@ -44,6 +46,13 @@ const SeoHead = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
+
+      {/* Structured data (Product, JobPosting, etc. — page-specific) */}
+      {jsonLdList.map((schema, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };

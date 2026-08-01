@@ -5,9 +5,15 @@ import { FaRegAddressBook ,FaPhoneAlt ,FaUser } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
+import SeoHead from "../../Seohead";
 const Buypackage = () => {
     return (
         <div className='h-screen'>
+        <SeoHead
+          title="Buy a Package"
+          description="Browse and purchase Cloud Company's web development, app development, and design packages."
+          canonical="/buypackage"
+        />
         <Navber/>
       <div> <div className='lg:w-1/2 w-full h-full flex flex-row justify-center items-center'>
             <div className='lg:w-1/2 w-auto bg-white shadow-md h-auto my-20 p-10'>

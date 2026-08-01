@@ -46,6 +46,7 @@ const Navber = () => {
             <li><NavLink to="/ourteam" className={navLinkClass}>Our Team</NavLink></li>
             <li><NavLink to="/career" className={navLinkClass}>Career</NavLink></li>
             <li><NavLink to="/portfolio" className={navLinkClass}>Portfolio</NavLink></li>
+            <li><NavLink to="/blog" className={navLinkClass}>Blog</NavLink></li>
           </ul>
 
           {/* Auth Section */}
@@ -117,6 +118,7 @@ const Navber = () => {
                   { to: '/ourteam', label: 'Our Team' },
                   { to: '/career', label: 'Career' },
                   { to: '/portfolio', label: 'Portfolio' },
+                  { to: '/blog', label: 'Blog' },
                 ].map(({ to, label }) => (
                   <li key={to}>
                     <NavLink

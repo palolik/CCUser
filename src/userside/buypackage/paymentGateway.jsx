@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { base_url } from "../../config/config";
 import Navber from '../navBer/navber';
 import Footer from '../footer/footer';
+import SeoHead from '../../Seohead';
 
 const generateRefCode = () => {
   const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -79,6 +80,7 @@ const handleConfirmPayment = async () => {
 
   return (
     <>
+      <SeoHead title="Complete Your Order" noIndex />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
         .pay-root { font-family: 'DM Sans', sans-serif; }

@@ -4,9 +4,16 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from '../footer/footer';
 import Navber from '../navBer/navber';
+import SeoHead from '../../Seohead';
 import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import Comments from '../Comments/comments';
+
+const stripHtmlToDescription = (html, maxLength = 160) => {
+  if (!html) return '';
+  const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
+};
 
 const PackDetails = () => {
   const [packageData, setPackageData] = useState(null);
@@ -72,8 +79,38 @@ const PackDetails = () => {
 
   const pkg = packageData?.package;
 
+  const metaDescription = pkg
+    ? stripHtmlToDescription(pkg.packageDetails) ||
+      `${pkg.packageName} — delivered in ${pkg.deliveryTime} days by Cloud Company.`
+    : undefined;
+
+  const productJsonLd = pkg
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: pkg.packageName,
+        description: metaDescription,
+        provider: { '@type': 'Organization', name: 'Cloud Company' },
+        offers: {
+          '@type': 'Offer',
+          price: pkg.packagePrice,
+          priceCurrency: 'USD',
+          availability: 'https://schema.org/InStock',
+        },
+      }
+    : undefined;
+
   return (
     <>
+      {pkg && (
+        <SeoHead
+          title={pkg.packageName}
+          description={metaDescription}
+          canonical={`/packdetails/${id}`}
+          ogImage={pkg.packageCover || undefined}
+          jsonLd={productJsonLd}
+        />
+      )}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
         .pack-root { font-family: 'DM Sans', sans-serif; }
@@ -226,6 +263,7 @@ const PackDetails = () => {
                           <img
                             src={feedback.cdp}
                             alt={feedback.cname}
+                            loading="lazy"
                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-slate-100 flex-shrink-0"
                           />
                           <div className="min-w-0 flex-1">

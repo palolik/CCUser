@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import SeoHead from "../../../Seohead";
 import Navber from "../../navBer/navber";
 import Footer from "../../footer/footer";
 import { base_url } from "../../../config/config";
@@ -47,11 +47,7 @@ const HomePortfolio = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Helmet>
-        <title>Portfolio | Cloud Company</title>
-        <meta name="description" content={buildDesc()} />
-        <link rel="canonical" href="https://cloudcompany.cc/portfolio" />
-      </Helmet>
+      <SeoHead title="Portfolio" description={buildDesc()} canonical="/portfolio" />
 
       <Navber />
 

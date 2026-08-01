@@ -9,6 +9,7 @@ import { FaRegAddressBook } from "react-icons/fa";
 import { RiTeamLine } from "react-icons/ri";
 import { AiOutlineTeam } from "react-icons/ai";
 import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
+import SeoHead from "../../Seohead";
 
 const processSteps = [
   { icon: <FaRegAddressBook className="text-blue-700 " /> , title: "Apply", desc: "Submit your application and portfolio. We review every application carefully." },
@@ -62,6 +63,17 @@ const Career = () => {
 
   return (
     <div className="w-full font-sans bg-gray-50">
+      {/* No JobPosting JSON-LD here: schema.org requires datePosted +
+          jobLocation, which the career/recruitment data model doesn't
+          currently store — emitting incomplete JobPosting schema would
+          surface as invalid structured data in Search Console. Add those
+          fields to the backend career docs first if per-role rich results
+          are wanted later. */}
+      <SeoHead
+        title="Careers"
+        description="Join Cloud Company — explore open roles in web development, design, and digital marketing, or join our talent pool."
+        canonical="/career"
+      />
       <Navber />
 
       {/* ── HERO ── */}

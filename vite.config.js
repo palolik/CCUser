@@ -1,31 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import sitemap from 'vite-plugin-sitemap'
 
-const SITE_URL = 'https://cloudcompany.cc'
-
-const staticRoutes = [
-  '/',
-  '/aboutus',
-  '/ourteam',
-  '/portfolio',
-  '/career',
-  '/signin',
-  '/clientsignin',
-  '/clientsignup',
-  '/buypackage',
-]
+// sitemap.xml is served dynamically by the backend (see
+// cloudcompanyserver/controllers/seo.controller.js) so it can include
+// package/portfolio IDs. A static build-time sitemap here would land in
+// dist/ and shadow that dynamic route in production (per .htaccess's
+// "serve existing file before falling back to index.html" rule) — so this
+// project intentionally does NOT generate its own sitemap.xml.
 
 export default defineConfig({
   plugins: [
     react(),
-    sitemap({
-      hostname: SITE_URL,
-      dynamicRoutes: staticRoutes,
-      changefreq: 'weekly',
-      priority: 0.8,
-      lastmod: new Date(),
-    }),
   ],
   build: {
     chunkSizeWarningLimit: 600,

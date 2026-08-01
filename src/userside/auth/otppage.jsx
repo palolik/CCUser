@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { base_url } from "../../config/config";
+import SeoHead from "../../Seohead";
 
 const ForgotPasswordOtp = () => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const ForgotPasswordOtp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+      <SeoHead title="Verify OTP" noIndex />
       <div className="bg-white shadow-2xl rounded-2xl w-full m-4 sm:w-96 p-8">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-3">
           Verify OTP

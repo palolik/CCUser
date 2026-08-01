@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../Provider/AuthProvider";
 import { base_url } from "../../config/config";
 import { Eye, EyeOff, User, Briefcase } from "lucide-react";
+import SeoHead from "../../Seohead";
 
 const Csignin = () => {
   const [remail, setEmail] = useState("");
@@ -13,6 +14,7 @@ const Csignin = () => {
   const [forgotLoading, setForgotLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AuthContext);
 
   const isClient = activeTab === "client";
@@ -94,6 +96,11 @@ const Csignin = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+      <SeoHead
+        title="Sign In"
+        description="Sign in to your Cloud Company client or employee account to manage orders, tasks, and your profile."
+        canonical={location.pathname}
+      />
       <div className="bg-white shadow-2xl rounded-2xl w-full m-4 sm:w-96 p-8">
 
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">

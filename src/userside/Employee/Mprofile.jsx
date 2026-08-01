@@ -5,6 +5,7 @@ import Footer from "../footer/footer";
 import Euser from "./User";
 import { AuthContext } from "../Provider/AuthProvider";
 import { base_url } from "../../config/config";
+import SeoHead from "../../Seohead";
 const MProfile = () => {
   const { user } = useContext(AuthContext);
   const [referralCode, setReferralCode] = useState("");
@@ -69,6 +70,7 @@ const MProfile = () => {
 
   return (
     <div>
+      <SeoHead title="Marketer Tools" noIndex />
       <Navber />
       <div className="lg:w-full flex lg:flex-row flex-col mx-20 justify-center h-full">
         <Euser employee={user} />

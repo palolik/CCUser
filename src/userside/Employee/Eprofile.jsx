@@ -7,6 +7,7 @@ import Euser from "./User";
 import Task from "./Task";
 import { base_url } from "../../config/config";
 import Portfolio from "./portfolio/portfolio";
+import SeoHead from "../../Seohead";
 const EmployeeProfile = () => {
   const { id } = useParams();
   const { user,token } = useContext(AuthContext);
@@ -60,6 +61,7 @@ useEffect(() => {
 
   return (
     <div className="overflow-hidden h-[70vm] bg-gradient-to-br from-slate-50 to-slate-100">
+      <SeoHead title="Employee Profile" noIndex />
       <Navber employee={employee} />
       <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start lg:justify-center  h-[70vm]">
         <Euser employee={employee} />

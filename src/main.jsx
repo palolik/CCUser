@@ -30,6 +30,8 @@ import PrivacyPolicy from './userside/footerpages/privactpolicy';
 import TermsConditions from './userside/footerpages/Terms&condition';
 import ForgotPasswordOtp from './userside/auth/otppage';
 import ResetPassword from './userside/auth/resetpasswordpage';
+import BlogList from './userside/blog/BlogList';
+import BlogDetail from './userside/blog/BlogDetail';
 
 
 const router = createBrowserRouter([
@@ -133,7 +135,13 @@ const router = createBrowserRouter([
   element:<ForgotPasswordOtp />,
 },
 { path:"/reset-password" ,
-  element:<ResetPassword />}
+  element:<ResetPassword />},
+{ path: "/blog",
+  element: <BlogList />,
+},
+{ path: "/blog/:slug",
+  element: <BlogDetail />,
+},
   // {
   //   path: "/marketerprofile",
   //   element: <MProfile></MProfile>

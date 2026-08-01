@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { base_url } from "../../config/config";
+import SeoHead from "../../Seohead";
 import {
   FaUser,
   FaEnvelope,
@@ -220,6 +221,12 @@ const subdepartmentData = {
 
   return (
     <div className="w-full h-screen flex justify-center items-center bg-gradient-to-br from-blue-50 to-blue-100">
+      <SeoHead
+        title="Employee Sign Up"
+        description="Join Cloud Company as a team member — create your employee account to access tasks and projects."
+        canonical="/employeesignup"
+        noIndex
+      />
       <div className="bg-white shadow-xl rounded-2xl w-full sm:w-[420px] p-8 border border-gray-100">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Employee Sign Up

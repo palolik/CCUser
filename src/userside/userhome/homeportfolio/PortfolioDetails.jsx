@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import SeoHead from '../../../Seohead';
 import Footer from '../../footer/footer';
 import Navber from '../../navBer/navber';
 import { base_url } from '../../../config/config';
@@ -38,14 +38,13 @@ const PortfolioDetails = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{p ? `${p.title} | Cloud Company` : 'Portfolio | Cloud Company'}</title>
-        <meta name="description" content={p?.shortDetails || 'View this portfolio project by Cloud Company.'} />
-        <link rel="canonical" href={`https://cloudcompany.cc/portfolio/${p?._id || ''}`} />
-        <meta property="og:title" content={p ? `${p.title} | Cloud Company` : 'Portfolio | Cloud Company'} />
-        <meta property="og:description" content={p?.shortDetails || ''} />
-        {p?.image && !isPDF(p.image) && <meta property="og:image" content={p.image} />}
-      </Helmet>
+      <SeoHead
+        title={p?.title || 'Portfolio'}
+        description={p?.shortDetails || 'View this portfolio project by Cloud Company.'}
+        canonical={`/portfolio/${p?._id || ''}`}
+        ogImage={p?.image && !isPDF(p.image) ? p.image : undefined}
+        ogType="article"
+      />
 
       <Navber />
 

@@ -8,6 +8,7 @@ import RichTextEditor from '../utils/PichTextEditor';
 import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import { GiDiceSixFacesFive } from 'react-icons/gi';
+import SeoHead from '../../Seohead';
 
 const Requireddetails = () => {
   const { user } = useContext(AuthContext);
@@ -170,6 +171,7 @@ const Requireddetails = () => {
 
   return (
     <>
+      <SeoHead title={packageName ? `Order Details — ${packageName}` : 'Order Details'} noIndex />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
         .req-root { font-family: 'DM Sans', sans-serif; }

@@ -89,7 +89,7 @@ const Aboutus = () => {
           </div>
           <div className="rounded-3xl h-80 flex items-center justify-center relative overflow-hidden"
             style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a6e)" }}>
-           <img  src={storyImg} />
+           <img src={storyImg} alt="Illustration representing Cloud Company's mission of building software that supports business growth" loading="lazy" />
           </div>
         </div>
       </section>
@@ -99,7 +99,7 @@ const Aboutus = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="rounded-3xl h-80 flex items-center justify-center relative overflow-hidden"
             style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a6e)" }}>
-           <img  src={missionImg} />
+           <img src={missionImg} alt="Illustration representing Cloud Company's story and journey since 2019" loading="lazy" />
           </div>
           <div>
             <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">Our Story</p>

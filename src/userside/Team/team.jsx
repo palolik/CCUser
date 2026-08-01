@@ -3,6 +3,7 @@ import Navber from "../navBer/navber";
 import Footer from "../footer/footer";
 import { base_url } from "../../config/config";
 import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
+import SeoHead from "../../Seohead";
 
 const rankLabels = {
   1: "Leadership",
@@ -48,6 +49,11 @@ const Team = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <SeoHead
+        title="Our Team"
+        description="Meet the people behind Cloud Company — the leadership, developers, designers, and marketers building software and digital solutions since 2019."
+        canonical="/ourteam"
+      />
       <Navber />
 
       {/* Hero */}
