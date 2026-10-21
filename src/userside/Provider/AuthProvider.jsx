@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import { jwtDecode } from "jwt-decode";
+import { unregisterPush } from "../utils/push";
 
 export const AuthContext = createContext(null);
 
@@ -29,6 +30,8 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        // Stop pushes to this device; runs in the background so logout stays instant.
+        unregisterPush();
         localStorage.removeItem("authToken");
         localStorage.removeItem("authUser");
 

@@ -32,6 +32,7 @@ import ForgotPasswordOtp from './userside/auth/otppage';
 import ResetPassword from './userside/auth/resetpasswordpage';
 import BlogList from './userside/blog/BlogList';
 import BlogDetail from './userside/blog/BlogDetail';
+import PushManager from './userside/utils/PushManager';
 
 
 const router = createBrowserRouter([
@@ -157,6 +158,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <Social />
         <SupportChat />
+        <PushManager />
         <RouterProvider router={router} />
       </AuthProvider>
     </HelmetProvider>
