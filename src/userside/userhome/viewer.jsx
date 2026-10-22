@@ -5,6 +5,7 @@ import Navber from "../navBer/navber";
 import Footer from "../footer/footer";
 import Home3 from "./home/home3";
 import SeoHead from "../../Seohead";
+import { Shimmer, ShimmerGrid } from "../utils/Shimmer";
 
 const Stats = lazy(() => import("./stats/stats"));
 const Tech = lazy(() => import("./tech/tech"));
@@ -17,8 +18,12 @@ const OurClient = lazy(() => import("./OurClient/OurClient"));
 const Process = lazy(() => import("./process/process"));
 
 const SectionLoader = () => (
-  <div className="w-full py-10 text-center text-gray-400 text-sm">
-    Loading section...
+  <div className="w-full py-24 px-6" role="status" aria-label="Loading">
+    <div className="flex flex-col items-center mb-12">
+      <Shimmer className="h-3 w-24 rounded mb-4" />
+      <Shimmer className="h-10 w-full max-w-md rounded" />
+    </div>
+    <ShimmerGrid count={3} className="max-w-6xl mx-auto" />
   </div>
 );
 

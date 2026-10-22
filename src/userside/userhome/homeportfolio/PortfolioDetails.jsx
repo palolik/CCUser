@@ -4,6 +4,7 @@ import SeoHead from '../../../Seohead';
 import Footer from '../../footer/footer';
 import Navber from '../../navBer/navber';
 import { base_url } from '../../../config/config';
+import { Shimmer, ShimmerText } from '../../utils/Shimmer';
 
 const PortfolioDetails = () => {
   const [portfolioData, setPortfolioData] = useState(null);
@@ -25,9 +26,26 @@ const PortfolioDetails = () => {
   const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
   if (loading) return (
-    <div className="w-full h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-10 h-10 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-    </div>
+    <>
+      <Navber />
+      <section className="relative px-6 py-16 overflow-hidden" role="status" aria-label="Loading"
+        style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+        <div className="max-w-3xl mx-auto relative opacity-20">
+          <Shimmer className="h-4 w-36 rounded mb-8" />
+          <Shimmer className="h-10 md:h-12 w-3/4 rounded mb-6" />
+          <Shimmer className="h-4 w-48 max-w-full rounded" />
+        </div>
+      </section>
+      <div className="max-w-3xl mx-auto px-6 pb-20 -mt-10 relative z-10" aria-hidden="true">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6 p-0">
+          <Shimmer className="w-full h-64 sm:h-80" />
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-7">
+          <Shimmer className="h-6 w-48 max-w-full rounded mb-4" />
+          <ShimmerText lines={4} />
+        </div>
+      </div>
+    </>
   );
 
   if (error) return (

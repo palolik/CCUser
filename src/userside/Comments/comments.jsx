@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { base_url } from '../../config/config.jsx';
 import cicon from '/assets/aicon.png';
+import { ShimmerList } from '../utils/Shimmer';
 
 
 const TimeAgo = ({ date }) => {
@@ -22,11 +23,16 @@ const Comments = ({ productId }) => {
   const [likedReplies, setLikedReplies] = useState(new Set());
   const [posting, setPosting] = useState(false);
   const [postingReply, setPostingReply] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchComments = async () => {
-    const res = await fetch(`${base_url}/comments/${productId}`);
-    const data = await res.json();
-    setComments(data);
+    try {
+      const res = await fetch(`${base_url}/comments/${productId}`);
+      const data = await res.json();
+      setComments(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -135,7 +141,9 @@ const Comments = ({ productId }) => {
       {comments.length > 0 && <div className="h-px bg-slate-100 mb-5 sm:mb-6" />}
 
       {/* Comments List */}
-      {comments.length === 0 ? (
+      {loading ? (
+        <ShimmerList rows={3} />
+      ) : comments.length === 0 ? (
         <div className="text-center py-10">
           <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

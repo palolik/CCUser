@@ -5,8 +5,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
+import { Shimmer, ShimmerGrid } from "../utils/Shimmer";
 
-const Packages = ({ category = [], packages = [] }) => {
+const Packages = ({ category = [], packages = [], loading = false }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -89,6 +90,8 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
               ✦ Custom Package
             </button>
           </>
+        ) : loading ? (
+          [0, 1, 2, 3].map((i) => <Shimmer key={i} className="h-9 w-28 rounded-full" />)
         ) : (
           <p className="text-gray-400 font-light text-sm">No categories available</p>
         )}
@@ -99,6 +102,14 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
         <div className="w-full  mx-auto text-center">
           <CustomPackageRequest />
         </div>
+      ) : loading && withFeatured.length === 0 ? (
+        <ShimmerGrid
+          count={4}
+          cols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          gap="gap-5"
+          card={{ image: false, lines: 6, className: "rounded-3xl p-7" }}
+          className="max-w-6xl mx-auto"
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 max-w-6xl mx-auto">
           {withFeatured.length > 0 ? withFeatured.map((pack) => (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Users, Package, Star, Eye, TrendingUp } from "lucide-react";
 import { base_url } from "../../../config/config";
+import { ShimmerStats } from "../../utils/Shimmer";
 
 const statConfig = [
   { key: "clients",  label: "Active Clients",     icon: Users,   color: "blue",   trend: "+12%" },
@@ -96,12 +97,14 @@ const StatCard = ({ label, rawValue, icon: Icon, color, trend, delay }) => {
 
 const Stats = () => {
   const [stats, setStats] = useState({ clients: 0, packages: 0, reviews: 0, views: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${base_url}/stats`)
       .then((res) => res.json())
       .then(setStats)
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -124,6 +127,13 @@ const Stats = () => {
       </div>
 
       {/* Grid */}
+      {loading ? (
+        <ShimmerStats
+          count={statConfig.length}
+          cols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          className="max-w-5xl mx-auto"
+        />
+      ) : (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
         {statConfig.map((s, i) => (
           <StatCard
@@ -137,6 +147,7 @@ const Stats = () => {
           />
         ))}
       </div>
+      )}
     </section>
   );
 };

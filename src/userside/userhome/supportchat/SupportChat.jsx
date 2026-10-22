@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { MessageCircle } from "lucide-react";
 import { base_url, chat_url } from "../../../config/config";
+import { ShimmerList } from "../../utils/Shimmer";
 
 const SeenLabel = ({ read }) => (
   read
@@ -14,6 +15,7 @@ const SupportChat = ({ forceOpen = false }) => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [supportId, setSupportId] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [inputValue, setInputValue] = useState("");
   const [socket, setSocket] = useState(null);
   const [isSending, setIsSending] = useState(false);
@@ -110,6 +112,8 @@ const SupportChat = ({ forceOpen = false }) => {
       setMessages(data);
     } catch (err) {
       console.error("Error fetching support chat messages:", err);
+    } finally {
+      setMessagesLoading(false);
     }
   };
 
@@ -313,7 +317,9 @@ const handleSendMessage = async () => {
                 className="flex-1 overflow-y-auto px-4 py-3 space-y-2"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "#93c5fd #f1f5f9", maxHeight: "60vh" }}
               >
-                {messages.length === 0 ? (
+                {messagesLoading && messages.length === 0 ? (
+                  <ShimmerList rows={3} />
+                ) : messages.length === 0 ? (
                   <p className="text-center text-gray-500 text-sm pt-4">Start your conversation below</p>
                 ) : (
                   (() => {

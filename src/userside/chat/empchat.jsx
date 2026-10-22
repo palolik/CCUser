@@ -6,6 +6,7 @@ import { FaPaperclip, FaFileAlt, FaFilePdf, FaFileWord, FaFileExcel, FaDownload 
 import { base_url, chat_url } from '../../config/config';
 import { IoSend } from "react-icons/io5";
 import { IoChatbubblesOutline, IoChatbubbles } from "react-icons/io5";
+import { ShimmerList } from '../utils/Shimmer';
 
 const isImage = (mimetype) => mimetype?.startsWith('image/');
 
@@ -66,6 +67,7 @@ const SeenLabel = ({ read }) => (
 
 const Echat = ({ selectedTaskId }) => {
   const { user } = useContext(AuthContext);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [messages, setMessages]       = useState([]);
   const [inputValue, setInputValue]   = useState('');
   const [socket, setSocket]           = useState(null);
@@ -125,12 +127,14 @@ const Echat = ({ selectedTaskId }) => {
   /* fetch + poll */
   useEffect(() => {
     if (!selectedTaskId) return;
+    setMessagesLoading(true);
     const load = async () => {
       try {
         const response = await fetch(`${base_url}/empchat/${selectedTaskId}`);
         if (!response.ok) throw new Error();
         setMessages(await response.json());
       } catch { /* silent */ }
+      finally { setMessagesLoading(false); }
     };
     load();
     const interval = setInterval(load, 300);
@@ -259,7 +263,7 @@ useEffect(() => {
               className="flex-1 overflow-y-auto px-3 py-2 space-y-4"
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#93c5fd #f1f5f9' }}
             >
-              {messages.map((msg, index) => {
+              {messagesLoading ? <ShimmerList rows={6} /> : messages.map((msg, index) => {
                 const isEmp = msg.sender === 'emp';
                 return (
                   <div key={index} className={`flex flex-col ${isEmp ? 'items-end' : 'items-start'}`}>

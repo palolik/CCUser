@@ -5,6 +5,7 @@ import Footer from "../footer/footer";
 import SeoHead from "../../Seohead";
 import { base_url } from "../../config/config";
 import BlogJsxRenderer from "./BlogJsxRenderer";
+import { Shimmer, ShimmerText } from "../utils/Shimmer";
 
 const formatDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "";
@@ -38,8 +39,26 @@ const BlogDetail = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-10 h-10 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Navber />
+        <section className="px-6 py-16" role="status" aria-label="Loading"
+          style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
+          <div className="max-w-3xl mx-auto opacity-20">
+            <Shimmer className="h-4 w-28 rounded mb-8" />
+            <Shimmer className="h-9 md:h-12 w-full rounded mb-3" />
+            <Shimmer className="h-9 md:h-12 w-2/3 rounded mb-5" />
+            <ShimmerText lines={2} className="max-w-2xl mb-5" />
+            <Shimmer className="h-4 w-64 max-w-full rounded" />
+          </div>
+        </section>
+        <div className="max-w-3xl mx-auto w-full px-6 py-10 flex-1">
+          <div className="w-full flex flex-col gap-6 p-6 bg-white rounded-2xl" aria-hidden="true">
+            <Shimmer className="h-6 w-2/3 rounded" />
+            <ShimmerText lines={4} />
+            <Shimmer className="h-48 sm:h-64 w-full rounded-xl" />
+            <ShimmerText lines={5} />
+          </div>
+        </div>
       </div>
     );
   }

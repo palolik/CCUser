@@ -10,13 +10,14 @@ import { base_url } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import LoadingSpinner from "../utils/loaderSpinner";
+import { Shimmer, ShimmerText, ShimmerList } from "../utils/Shimmer";
 
 // inside component
 const Cuser = () => {
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
   const [paidOrders, setPaidOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -49,6 +50,7 @@ const navigate = useNavigate();
         const data = await res.json();
         if (Array.isArray(data)) setPaidOrders(data);
       } catch (err) { console.error("Error fetching paid orders:", err); }
+      finally { setOrdersLoading(false); }
     };
     if (id) fetchPaidOrders();
   }, [id]);
@@ -295,7 +297,21 @@ const generateInvoicePDF = (order) => {
 };
   if (!userData)
     return (
-     <LoadingSpinner/>
+      <div className="px-4 lg:px-0">
+        <div className="w-full lg:w-[400px] lg:mt-6 p-4 bg-white rounded-md flex flex-col gap-4" role="status" aria-label="Loading">
+          <div className="flex flex-row items-center gap-4">
+            <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
+            <div className="flex-1 min-w-0">
+              <Shimmer className="h-4 w-2/3 rounded mb-2" />
+              <Shimmer className="h-3 w-1/2 rounded" />
+            </div>
+          </div>
+          <div className="hidden md:block px-2">
+            <Shimmer className="h-4 w-32 rounded mb-4" />
+            <ShimmerText lines={4} />
+          </div>
+        </div>
+      </div>
     );
 
   return (
@@ -347,7 +363,9 @@ const generateInvoicePDF = (order) => {
             <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-semibold">{paidOrders.length}</span>
           </p>
 
-          {paidOrders.length === 0 ? (
+          {ordersLoading ? (
+            <ShimmerList rows={2} avatar={false} />
+          ) : paidOrders.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-3">No paid orders yet.</p>
           ) : (
 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#bfdbfe transparent' }}>

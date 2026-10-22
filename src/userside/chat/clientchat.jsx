@@ -8,6 +8,7 @@ import { chat_url } from '../../config/config';
 import { IoSend } from "react-icons/io5";
 import { PiChatCircleTextFill } from "react-icons/pi";
 import { IoChatbubblesOutline, IoChatbubbles } from "react-icons/io5";
+import { ShimmerList } from '../utils/Shimmer';
 
 const isImage = (mimetype) => mimetype?.startsWith('image/');
 
@@ -74,6 +75,7 @@ const AttachmentPreview = ({ attachments, isClient }) => {
 const Cchat = ({ selectedProjectId, isChatTabActive = true }) => {
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [socket, setSocket] = useState(null);
   const [isSending, setIsSending] = useState(false);
@@ -222,12 +224,14 @@ const shouldPlayNotification = () => {
   useEffect(() => {
     if (!selectedProjectId) {
       setMessages([]);
+      setMessagesLoading(false);
       return;
     }
 
     const projectId = selectedProjectId;
     activeProjectRef.current = projectId;
     const controller = new AbortController();
+    setMessagesLoading(true);
 
     const fetchMessages = async () => {
       try {
@@ -246,6 +250,10 @@ const shouldPlayNotification = () => {
       } catch (error) {
         if (error.name !== 'AbortError') {
           console.error('Error fetching messages:', error);
+        }
+      } finally {
+        if (activeProjectRef.current === projectId && !controller.signal.aborted) {
+          setMessagesLoading(false);
         }
       }
     };
@@ -455,7 +463,9 @@ setMessages((prevMessages) => {
               className="flex-1 overflow-y-auto px-4 py-3 space-y-4"
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#93c5fd #f1f5f9' }}
             >
-              {messages.length === 0 ? (
+              {messagesLoading ? (
+                <ShimmerList rows={6} />
+              ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[40vh] min-h-[30vh] text-center px-6">
                   <div className="text-5xl mb-4"></div>
                   <p className="text-lg font-semibold text-gray-700 mb-1">

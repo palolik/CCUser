@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
+import { Shimmer, ShimmerText } from "../utils/Shimmer";
 
 const ProfilePacks = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -107,7 +108,7 @@ const ProfilePacks = () => {
         {loadingCategories ? (
           <div className="flex gap-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-9 w-24 rounded-full bg-gray-200 animate-pulse" />
+              <Shimmer key={i} className="h-9 w-24 rounded-md" />
             ))}
           </div>
         ) : (
@@ -149,16 +150,14 @@ const ProfilePacks = () => {
       ) : (
         /* Package Cards */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl w-full">
-          {loadingPackages ? (
+          {loadingPackages || loadingCategories ? (
             [1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-4 animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto" />
-                <div className="h-12 bg-gray-200 rounded w-1/2 mx-auto" />
+              <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-4" aria-hidden="true">
+                <Shimmer className="h-6 rounded w-3/4 mx-auto" />
+                <Shimmer className="h-12 rounded w-1/2 mx-auto" />
                 <div className="border-t border-gray-100 my-1" />
-                {[1, 2, 3].map((j) => (
-                  <div key={j} className="h-4 bg-gray-200 rounded w-full" />
-                ))}
-                <div className="mt-auto h-10 bg-gray-200 rounded-xl" />
+                <ShimmerText lines={3} />
+                <Shimmer className="mt-auto h-10 rounded-xl" />
               </div>
             ))
           ) : filteredPacks.length > 0 ? (

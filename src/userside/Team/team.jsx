@@ -4,6 +4,7 @@ import Footer from "../footer/footer";
 import { base_url } from "../../config/config";
 import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
 import SeoHead from "../../Seohead";
+import { Shimmer, ShimmerText } from "../utils/Shimmer";
 
 const rankLabels = {
   1: "Leadership",
@@ -16,14 +17,12 @@ const rankLabels = {
 const getInitials = (name) =>
   name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
-const ShimmerCard = () => (
-  <div className="bg-white border border-gray-200 rounded-3xl p-8 w-52 text-center">
-    <div className="w-24 h-24 rounded-2xl bg-gray-200 animate-pulse mx-auto mb-5" />
-    <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4 mx-auto mb-2" />
-    <div className="h-2.5 bg-gray-100 rounded animate-pulse w-1/2 mx-auto mb-3" />
-    <div className="h-2 bg-gray-100 rounded animate-pulse w-full mx-auto mb-1.5" />
-    <div className="h-2 bg-gray-100 rounded animate-pulse w-5/6 mx-auto mb-1.5" />
-    <div className="h-2 bg-gray-100 rounded animate-pulse w-4/6 mx-auto" />
+const TeamShimmerCard = () => (
+  <div className="bg-white border border-gray-200 rounded-3xl p-8 w-52 text-center" aria-hidden="true">
+    <Shimmer className="w-24 h-24 rounded-2xl mx-auto mb-5" />
+    <Shimmer className="h-3 rounded w-3/4 mx-auto mb-2" />
+    <Shimmer className="h-2.5 rounded w-1/2 mx-auto mb-3" />
+    <ShimmerText lines={3} />
   </div>
 );
 
@@ -83,8 +82,8 @@ const Team = () => {
       {/* Team Grid */}
       <div className="max-w-5xl mx-auto w-full px-6 py-20 flex-1">
         {loading ? (
-          <div className="flex flex-wrap justify-center gap-6">
-            {Array.from({ length: 6 }).map((_, i) => <ShimmerCard key={i} />)}
+          <div className="flex flex-wrap justify-center gap-6" role="status" aria-label="Loading">
+            {Array.from({ length: 6 }).map((_, i) => <TeamShimmerCard key={i} />)}
           </div>
         ) : (
           Object.keys(team).sort((a, b) => a - b).map((rank) => (

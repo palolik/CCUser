@@ -8,6 +8,7 @@ import SeoHead from '../../Seohead';
 import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import Comments from '../Comments/comments';
+import { Shimmer, ShimmerText } from '../utils/Shimmer';
 
 const stripHtmlToDescription = (html, maxLength = 160) => {
   if (!html) return '';
@@ -65,9 +66,32 @@ const PackDetails = () => {
 
   if (loading)
     return (
-      <div className="w-full h-screen flex justify-center items-center bg-slate-50">
-        <img src="/assets/iconsvg.svg" alt="Loading..." className="w-14 h-14 animate-spin" />
-      </div>
+      <>
+        <Navber />
+        <div className="min-h-screen bg-slate-50" role="status" aria-label="Loading">
+          <Shimmer className="w-full h-48 sm:h-64 md:h-96" />
+          <div className="max-w-5xl mx-auto px-3 sm:px-5 md:px-8 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
+            <div>
+              <Shimmer className="h-3 w-28 rounded mb-2 sm:mb-4" />
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+                {[0, 1].map((i) => (
+                  <div key={i} className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
+                    <Shimmer className="h-3 w-16 rounded mb-3" />
+                    <Shimmer className="h-8 sm:h-10 w-24 max-w-full rounded mb-4" />
+                    <Shimmer className="h-3 w-3/4 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            {[5, 4, 3].map((lines, i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+                <Shimmer className="h-3 w-32 rounded mb-4" />
+                <ShimmerText lines={lines} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
     );
 
   if (error)

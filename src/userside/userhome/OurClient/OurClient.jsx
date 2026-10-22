@@ -1,9 +1,19 @@
-const OurClient = ({ clientData }) => {
-  if (!clientData) {
+import { Shimmer } from "../../utils/Shimmer";
+
+const OurClient = ({ clientData, loading = false }) => {
+  if (!clientData || (loading && clientData.length === 0)) {
     return (
-      <div className="w-full flex items-center justify-center py-16">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-      </div>
+      <section className="py-20 bg-white overflow-hidden" role="status" aria-label="Loading">
+        <div className="flex flex-col items-center mb-14 px-6">
+          <Shimmer className="h-3 w-24 rounded mb-4" />
+          <Shimmer className="h-10 w-full max-w-md rounded" />
+        </div>
+        <div className="flex gap-4 overflow-hidden">
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <Shimmer key={i} className="w-44 h-20 flex-shrink-0 rounded-2xl" />
+          ))}
+        </div>
+      </section>
     );
   }
 

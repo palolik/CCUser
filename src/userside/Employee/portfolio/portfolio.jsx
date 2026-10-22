@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { base_url } from "../../../config/config";
 import Swal from "sweetalert2";
+import { Shimmer, ShimmerText } from "../../utils/Shimmer";
 
 const Portfolio = ({ userid }) => {
   const [showModal, setShowModal] = useState(false);
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [form, setForm] = useState({
     title: "",
     link: "",
@@ -22,6 +24,8 @@ const Portfolio = ({ userid }) => {
       if (Array.isArray(data)) setPortfolios(data);
     } catch (err) {
       console.error("Fetch portfolio error:", err);
+    } finally {
+      setFetching(false);
     }
   };
 
@@ -154,7 +158,17 @@ const Portfolio = ({ userid }) => {
       {/* Portfolio Cards */}
       <div className="max-h-[520px] overflow-y-auto pr-1 space-y-3
         scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-        {portfolios.length === 0 && (
+        {fetching && portfolios.length === 0 && [0, 1, 2].map((i) => (
+          <div key={i} className="flex gap-4 p-4 bg-white border border-gray-100 rounded-xl" aria-hidden="true">
+            <Shimmer className="w-24 h-24 rounded-lg flex-shrink-0" />
+            <div className="flex-1 min-w-0 pt-0.5">
+              <Shimmer className="h-4 w-2/3 rounded mb-3" />
+              <ShimmerText lines={2} />
+            </div>
+          </div>
+        ))}
+
+        {!fetching && portfolios.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-gray-400">
         
             <p className="text-sm font-medium">No portfolio items yet</p>

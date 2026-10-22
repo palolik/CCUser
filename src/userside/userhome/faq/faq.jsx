@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Shimmer } from "../../utils/Shimmer";
 
-const Faq = ({ faqs }) => {
+const Faq = ({ faqs, loading = false }) => {
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggle = (i) => setOpenIndex(openIndex === i ? null : i);
@@ -57,6 +58,13 @@ const Faq = ({ faqs }) => {
                 </div>
               </div>
 
+            </div>
+          ))
+        ) : loading ? (
+          [0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-200 flex items-center justify-between gap-4 px-6 py-5" aria-hidden="true">
+              <Shimmer className="h-4 w-2/3 rounded" />
+              <Shimmer className="w-8 h-8 rounded-full flex-shrink-0" />
             </div>
           ))
         ) : (

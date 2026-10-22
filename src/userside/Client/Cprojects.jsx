@@ -12,6 +12,7 @@ import { GrCheckbox } from "react-icons/gr";
 import { base_url } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 import ProfilePacks from "../packages/profilepacks";
+import { Shimmer, ShimmerList } from "../utils/Shimmer";
 
 const Cproject = ({ eid }) => {
   const { user } = useContext(AuthContext);
@@ -67,6 +68,25 @@ const Cproject = ({ eid }) => {
   const handleProjectClick = (id) => {
     setSelectedProjectId(id);
   };
+
+  if (loading) {
+    return (
+      <div className="w-full flex  flex-col lg:flex-row gap-0 lg:gap-6 p-3 lg:p-6 lg:min-h-[85vh]">
+        <div className="flex-1 hidden lg:block">
+          <div className="h-[80vh] w-full bg-white rounded-sm border border-gray-50 p-4">
+            <ShimmerList rows={6} />
+          </div>
+        </div>
+        <div className="w-full lg:w-[400px] xl:w-[440px] flex-shrink-0 flex flex-col rounded-md  border border-gray-100 bg-white  overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 justify-between flex flex-row text-black ">
+            <h2 className=" font-semibold tracking-wide">My Projects</h2>
+            <Shimmer className="h-3 w-12 rounded mt-1" />
+          </div>
+          <ShimmerList rows={4} avatar={false} className="px-4" />
+        </div>
+      </div>
+    );
+  }
 
   if (fetched && projects.length === 0) {
     return (

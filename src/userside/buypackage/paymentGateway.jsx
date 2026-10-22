@@ -4,6 +4,7 @@ import { base_url } from "../../config/config";
 import Navber from '../navBer/navber';
 import Footer from '../footer/footer';
 import SeoHead from '../../Seohead';
+import { Shimmer } from '../utils/Shimmer';
 
 const generateRefCode = () => {
   const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -22,6 +23,7 @@ const PaymentGateway = () => {
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [transactionId, setTransactionId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [methodsLoading, setMethodsLoading] = useState(true);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(null);
 
@@ -36,7 +38,8 @@ const PaymentGateway = () => {
         setPaymentMethods(data);
         if (data.length > 0) setSelectedMethod(data[0]);
       })
-      .catch(err => console.error("Error fetching payment methods:", err));
+      .catch(err => console.error("Error fetching payment methods:", err))
+      .finally(() => setMethodsLoading(false));
   }, []);
 
   const handleCopy = (text, key) => {
@@ -205,6 +208,15 @@ const handleConfirmPayment = async () => {
           <section className="fade-in fade-in-3 bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
             <p className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-4">Select Payment Method</p>
             <div className="flex flex-col gap-2 sm:gap-3">
+              {methodsLoading && [0, 1, 2].map((i) => (
+                <div key={i} className="w-full rounded-xl border-2 border-slate-200 px-4 py-3.5 flex items-center gap-3" aria-hidden="true">
+                  <Shimmer className="w-4 h-4 rounded-full flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Shimmer className="h-3.5 w-1/3 rounded mb-2" />
+                    <Shimmer className="h-3 w-1/2 rounded" />
+                  </div>
+                </div>
+              ))}
               {paymentMethods.map((method) => {
                 const isSelected = selectedMethod?._id === method._id;
                 return (

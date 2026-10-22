@@ -9,6 +9,7 @@ import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import { GiDiceSixFacesFive } from 'react-icons/gi';
 import SeoHead from '../../Seohead';
+import { Shimmer, ShimmerText } from '../utils/Shimmer';
 
 const Requireddetails = () => {
   const { user } = useContext(AuthContext);
@@ -25,6 +26,7 @@ const Requireddetails = () => {
   const [enteredCoupon, setEnteredCoupon] = useState('');
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null); // 'valid' | 'invalid' | null
+  const [loading, setLoading] = useState(!!packageId);
 
   useEffect(() => {
     if (!packageId) return;
@@ -34,7 +36,8 @@ const Requireddetails = () => {
         setPackageData(data.package);
         setCouponData(data.coupons);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, [packageId]);
 
   const handleInputChange = (e) => {
@@ -213,7 +216,7 @@ const Requireddetails = () => {
               Order Details
             </span>
             <h1 className="req-title text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-              {packageName || 'Package Order'}
+              {loading ? <Shimmer className="h-7 sm:h-9 w-64 max-w-full rounded opacity-60" /> : (packageName || 'Package Order')}
             </h1>
           </div>
         </div>
@@ -233,14 +236,14 @@ const Requireddetails = () => {
                   <div className="price-card bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1">
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400">Regular</span>
                     <div className="flex items-end gap-1 mt-1">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">${packagePrice}</span>
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">${packagePrice}</span>}
                     </div>
                     <div className="divider my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 flex-wrap">
                       <svg className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>Delivery in <span className="font-semibold text-slate-700">{deliveryTime} days</span></span>
+                      {loading ? <Shimmer className="h-3 w-24 rounded" /> : <span>Delivery in <span className="font-semibold text-slate-700">{deliveryTime} days</span></span>}
                     </div>
                   </div>
 
@@ -252,14 +255,14 @@ const Requireddetails = () => {
                     <div className="absolute top-2 right-2 bg-blue-500/40 text-white text-[8px] sm:text-[10px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full">Fast Track</div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">${Number(expressDeliveryPrice) + Number(packagePrice)}</span>
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded opacity-30" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">${Number(expressDeliveryPrice) + Number(packagePrice)}</span>}
                     </div>
                     <div className="h-px bg-blue-500/50 my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-blue-100 flex-wrap">
                       <svg className="w-3.5 h-3.5 text-blue-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <span>Delivery in <span className="font-semibold text-white">{expressDeliveryTime} days</span></span>
+                      {loading ? <Shimmer className="h-3 w-24 rounded opacity-30" /> : <span>Delivery in <span className="font-semibold text-white">{expressDeliveryTime} days</span></span>}
                     </div>
                   </div>
                 </div>
@@ -268,7 +271,7 @@ const Requireddetails = () => {
               {/* Deliverables */}
               <section className="fade-in fade-in-2 bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                 <p className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-3">What You'll Get</p>
-                <ul className="space-y-2">
+                {loading ? <ShimmerText lines={4} /> : <ul className="space-y-2">
                   {(packageContents || []).filter(c => c?.trim()).map((content, i) => (
                     <li key={i} className="flex items-start gap-2 sm:gap-3 text-sm text-slate-700">
                       <span className="mt-0.5 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
@@ -279,16 +282,16 @@ const Requireddetails = () => {
                       {content}
                     </li>
                   ))}
-                </ul>
+                </ul>}
               </section>
 
               {/* Requirements */}
               <section className="fade-in fade-in-2 bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                 <p className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-3">Required Attachments & Details</p>
-                <div
+                {loading ? <ShimmerText lines={3} /> : <div
                   className="prose prose-sm sm:prose prose-slate max-w-none text-slate-700 leading-relaxed [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5"
                   dangerouslySetInnerHTML={{ __html: packageRequirements }}
-                />
+                />}
               </section>
 
               {/* Project Title */}

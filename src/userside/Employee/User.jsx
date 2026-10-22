@@ -8,6 +8,7 @@ import { VscGraphLine } from "react-icons/vsc";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { base_url } from "../../config/config";
 import Portfolio from "./portfolio/portfolio";
+import { Shimmer, ShimmerText, ShimmerList } from "../utils/Shimmer";
 
 const Euser = () => {
   const { id } = useParams();
@@ -76,7 +77,24 @@ const Euser = () => {
     } catch { Swal.fire("Error", "Something went wrong", "error"); }
   };
 
-  if (!userData) return <p>Loading...</p>;
+  if (!userData)
+    return (
+      <div className="px-4 lg:px-0">
+        <div className="w-full lg:w-[400px] lg:mt-2 p-4 lg:h-[85vh] bg-white rounded-md flex-shrink-0 flex flex-col gap-4" role="status" aria-label="Loading">
+          <div className="flex flex-row items-center gap-4">
+            <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
+            <div className="flex-1 min-w-0">
+              <Shimmer className="h-4 w-2/3 rounded mb-2" />
+              <Shimmer className="h-3 w-1/2 rounded" />
+            </div>
+          </div>
+          <div className="hidden md:block">
+            <Shimmer className="h-8 w-48 rounded mb-4" />
+            <ShimmerText lines={8} />
+          </div>
+        </div>
+      </div>
+    );
 
   const totalWorkTime       = tasks.reduce((s, t) => s + parseInt(t.ttime || 0), 0);
   const totalTasksCompleted = tasks.length;
@@ -151,7 +169,9 @@ const Euser = () => {
                 ].map(({ icon, label, value }) => (
                   <div key={label} className="flex justify-between border-b border-gray-100 pb-2">
                     <span className="flex items-center gap-2 text-gray-600">{icon} {label}</span>
-                    <span className="font-medium text-gray-800 break-all text-right">{value || "—"}</span>
+                    {loadingTasks && ["Work Time", "Tasks Done", "CC Earned"].includes(label)
+                      ? <Shimmer className="h-4 w-12 rounded" />
+                      : <span className="font-medium text-gray-800 break-all text-right">{value || "—"}</span>}
                   </div>
                 ))}
               </div>
@@ -164,7 +184,7 @@ const Euser = () => {
               </p>
               <div className= {`max-h-[220px] ${iscOpen ? "block" : "hidden"}  overflow-y-auto space-y-2 pr-1`} style={{ scrollbarWidth:"thin", scrollbarColor:"#bfdbfe transparent" }}>
                 {loadingTasks ? (
-                  <p className="text-center text-gray-400 text-sm">Loading…</p>
+                  <ShimmerList rows={3} avatar={false} />
                 ) : tasks.length > 0 ? tasks.map(task => (
                   <div key={task._id} className="flex justify-between items-start bg-white rounded-lg border border-gray-200 py-2 px-3 hover:shadow-md transition-all">
                     <div>

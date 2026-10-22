@@ -8,7 +8,7 @@ import Echat from "../chat/empchat";
 import { AuthContext } from './../Provider/AuthProvider';
 import { base_url } from "../../config/config";
 import Placeholder from "./Placeholder";
-import LoadingSpinner from "../utils/loaderSpinner";
+import { Shimmer, ShimmerList } from "../utils/Shimmer";
 const Task = () => {
   const { user } = useContext(AuthContext);
 const [loading, setLoading] = useState(true);
@@ -217,8 +217,31 @@ const handleExpire = (taskId) => {
 
 if (loading) {
   return (
-    <div className="flex items-center justify-center h-[85vh]">
-<LoadingSpinner/>   </div>
+    <div className="flex flex-col lg:flex-row gap-2 w-full p-2" role="status" aria-label="Loading">
+      <div className="flex-1 min-w-0 hidden lg:block">
+        <div className="h-[85vh] bg-white rounded-sm border border-gray-50 p-4">
+          <ShimmerList rows={6} />
+        </div>
+      </div>
+      <div className="lg:w-[400px] w-full lg:h-[85vh] bg-white p-2 rounded-md flex flex-col">
+        <div className="text-xl font-semibold text-gray-800 border-b pb-1 mb-4 flex items-center justify-between">
+          <span>My Tasks</span>
+          <Shimmer className="h-3 w-14 rounded" />
+        </div>
+        <div className="space-y-4">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="rounded-md border border-gray-100 p-3">
+              <Shimmer className="h-3 w-1/2 rounded mb-2" />
+              <Shimmer className="h-4 w-3/4 rounded mb-4" />
+              <div className="flex gap-2">
+                <Shimmer className="h-6 w-14 rounded-sm" />
+                <Shimmer className="h-6 w-16 rounded-sm" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

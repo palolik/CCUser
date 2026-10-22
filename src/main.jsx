@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Viewer from './userside/userhome/viewer';
 import Signin from './userside/auth/Csignin';
 import SignUp from './userside/auth/Csignup';
@@ -21,6 +21,15 @@ import Clientprofile from './userside/Client/Cprofile';
 import PackDetails from './userside/packages/packdetails';
 import { base_url } from './config/config';
 import ErrorPage from './userside/ErrorPage/ErrorPage';
+import { PageShimmer, RouteLoadingBar } from './userside/utils/Shimmer';
+
+// Wraps every route: shows a top loading bar while the next page's data loads.
+const RootLayout = () => (
+  <>
+    <RouteLoadingBar />
+    <Outlet />
+  </>
+);
 import HomePortfolio from './userside/userhome/homeportfolio/homeportfolio';
 import { HelmetProvider } from 'react-helmet-async'
 import PortfolioDetail from './userside/userhome/homeportfolio/PortfolioDetails';
@@ -38,6 +47,7 @@ import PushManager from './userside/utils/PushManager';
 
 const router = createBrowserRouter([
   {
+  element: <RootLayout />,
   errorElement: <ErrorPage />,
   children: [
   {
@@ -71,7 +81,6 @@ const router = createBrowserRouter([
   {
     path: "/packdetails/:id",
     element: <PackDetails />,
-    loader: ({ params }) => fetch(`${base_url}/packdetails/${params.id}`),
   },
   {
     path: "/aboutus",
@@ -93,7 +102,6 @@ const router = createBrowserRouter([
   {
     path: "/portfolio/:id",
     element: <PortfolioDetail />,
-    loader: ({ params }) => fetch(`${base_url}/getportfolio/${params.id}`),
   },
   {
     path: "/career",
@@ -102,17 +110,14 @@ const router = createBrowserRouter([
   {
     path: "/marketerprofile/:id",
     element: <MProfile />,
-    loader: ({ params }) => fetch(`${base_url}/employeeprofile/${params.id}`),
   },
   {
     path: "/employeeprofile/:id",
     element: <EmployeeProfile />,
-    loader: ({ params }) => fetch(`${base_url}/employeeprofile/${params.id}`),
   },
   {
     path: "/clientprofile/:id",
     element: <Clientprofile />,
-    loader: ({ params }) => fetch(`${base_url}/clientprofile/${params.id}`),
   }
   ,
   {
@@ -167,7 +172,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Social />
         <SupportChat />
         <PushManager />
-        <RouterProvider router={router} />
+        <RouterProvider router={router} fallbackElement={<PageShimmer />} />
       </AuthProvider>
     </HelmetProvider>
 

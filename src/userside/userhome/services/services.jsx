@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { base_url } from "../../../config/config";
 import AnimatedNetworkBackground from "../home/animatednetwork";
 import ServicesAnimatedBackground from "./serviceanimatedbackground";
-const Services = ({ serviceData = [] }) => {
+import { Shimmer, ShimmerText } from "../../utils/Shimmer";
+const Services = ({ serviceData = [], loading = false }) => {
   const [ads, setAds] = useState([]);
 
   useEffect(() => {
@@ -25,6 +26,34 @@ const Services = ({ serviceData = [] }) => {
       });
     } catch (e) { console.error(e); }
   };
+
+  if (loading && (!serviceData || serviceData.length === 0)) {
+    return (
+      <section className="relative py-24 px-6 bg-white" role="status" aria-label="Loading">
+        <div className="flex flex-col items-center mb-16">
+          <Shimmer className="h-3 w-24 rounded mb-4" />
+          <Shimmer className="h-10 w-full max-w-xl rounded" />
+        </div>
+        <div className="flex flex-col gap-5 max-w-[70rem] mx-auto">
+          {[0, 1, 2].map((idx) => (
+            <div
+              key={idx}
+              className={`flex flex-col bg-white border border-gray-200 rounded-3xl overflow-hidden ${
+                idx % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
+              }`}
+            >
+              <Shimmer className="md:w-[38%] w-full h-56 md:h-auto md:min-h-[16rem] flex-shrink-0" />
+              <div className="flex-1 p-8 md:p-10">
+                <Shimmer className="h-12 w-16 rounded mb-12" />
+                <Shimmer className="h-5 w-2/3 rounded mb-3" />
+                <ShimmerText lines={3} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (!serviceData || serviceData.length === 0) {
     return (

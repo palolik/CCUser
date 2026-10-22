@@ -10,6 +10,7 @@ import { RiTeamLine } from "react-icons/ri";
 import { AiOutlineTeam } from "react-icons/ai";
 import AnimatedNetworkBackground from "../userhome/home/animatednetwork";
 import SeoHead from "../../Seohead";
+import { ShimmerGrid } from "../utils/Shimmer";
 
 const processSteps = [
   { icon: <FaRegAddressBook className="text-blue-700 " /> , title: "Apply", desc: "Submit your application and portfolio. We review every application carefully." },
@@ -21,6 +22,7 @@ const perks = ["Remote Friendly", "Flexible Hours", "Learning Budget", "Growth C
 
 const Career = () => {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", cv: null });
@@ -29,7 +31,8 @@ const Career = () => {
     fetch(`${base_url}/recruitment`)
       .then((res) => res.json())
       .then(setJobs)
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   const handleChange = (e) => {
@@ -106,7 +109,14 @@ const Career = () => {
             <h2 className="font-serif text-4xl font-semibold text-gray-900"
               style={{ fontFamily: "'Playfair Display', serif" }}>Current Openings</h2>
           </div>
-          {jobs.length === 0 ? (
+          {loading ? (
+            <ShimmerGrid
+              count={3}
+              cols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              gap="gap-5"
+              card={{ image: false, lines: 2, className: "p-7 bg-gray-50" }}
+            />
+          ) : jobs.length === 0 ? (
             <p className="text-center text-gray-400 font-light py-12">No current openings — check back soon or join our talent pool below.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

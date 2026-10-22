@@ -5,6 +5,7 @@ import Navber from "../../navBer/navber";
 import Footer from "../../footer/footer";
 import { base_url } from "../../../config/config";
 import AnimatedNetworkBackground from "../home/animatednetwork";
+import { Shimmer, ShimmerGrid } from "../../utils/Shimmer";
 
 const HomePortfolio = () => {
   const [portfolios, setPortfolios] = useState([]);
@@ -82,16 +83,18 @@ const HomePortfolio = () => {
               {type === "all" ? "All Projects" : type.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </button>
           ))}
+          {loading && [0, 1, 2].map((i) => <Shimmer key={i} className="h-9 w-28 rounded-full" />)}
         </div>
       </div>
 
       {/* ── GRID ── */}
       <div className="max-w-5xl mx-auto w-full px-6 py-16 flex-1">
         {loading && (
-          <div className="text-center py-20">
-            <div className="w-10 h-10 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-400 font-light text-sm">Loading portfolios...</p>
-          </div>
+          <ShimmerGrid
+            count={6}
+            cols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            card={{ imageClass: "h-52", lines: 2 }}
+          />
         )}
 
         {!loading && filtered.length > 0 && (

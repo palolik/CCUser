@@ -4,6 +4,7 @@ import Navber from "../navBer/navber";
 import Footer from "../footer/footer";
 import SeoHead from "../../Seohead";
 import { base_url } from "../../config/config";
+import { ShimmerGrid } from "../utils/Shimmer";
 
 const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
@@ -42,10 +43,11 @@ const BlogList = () => {
 
       <div className="max-w-6xl mx-auto w-full px-6 py-16 flex-1">
         {loading && (
-          <div className="text-center py-20">
-            <div className="w-10 h-10 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-400 font-light text-sm">Loading articles...</p>
-          </div>
+          <ShimmerGrid
+            count={6}
+            cols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            card={{ imageClass: "h-52", lines: 2 }}
+          />
         )}
 
         {!loading && blogs.length === 0 && (

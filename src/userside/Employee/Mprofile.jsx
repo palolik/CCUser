@@ -6,6 +6,7 @@ import Euser from "./User";
 import { AuthContext } from "../Provider/AuthProvider";
 import { base_url } from "../../config/config";
 import SeoHead from "../../Seohead";
+import { Shimmer, ShimmerText, ShimmerForm, ShimmerTable } from "../utils/Shimmer";
 const MProfile = () => {
   const { user } = useContext(AuthContext);
   const [referralCode, setReferralCode] = useState("");
@@ -62,8 +63,36 @@ const MProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen text-gray-600">
-        Loading marketer profile...
+      <div className="min-h-screen" role="status" aria-label="Loading">
+        <div className="h-16 bg-white border-b border-gray-100 px-4 lg:px-10 flex items-center justify-between">
+          <Shimmer className="h-8 w-32 rounded" />
+          <Shimmer className="h-8 w-8 rounded-full" />
+        </div>
+        <div className="flex lg:flex-row flex-col gap-4 px-4 lg:px-10 py-4">
+          <div className="w-full lg:w-[400px] p-4 bg-white rounded-md flex-shrink-0 flex flex-col gap-4">
+            <div className="flex flex-row items-center gap-4">
+              <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
+              <div className="flex-1 min-w-0">
+                <Shimmer className="h-4 w-2/3 rounded mb-2" />
+                <Shimmer className="h-3 w-1/2 rounded" />
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <ShimmerText lines={6} />
+            </div>
+          </div>
+          <div className="flex-1 min-w-0 p-6 border border-gray-200 rounded-2xl flex flex-col gap-6">
+            <Shimmer className="h-7 w-48 max-w-full rounded" />
+            <div className="flex flex-col lg:flex-row w-full gap-8">
+              <div className="w-full lg:w-1/2 p-5 rounded-xl border border-gray-100">
+                <ShimmerForm fields={2} />
+              </div>
+              <div className="w-full lg:w-1/2 min-w-0">
+                <ShimmerTable rows={2} cols={3} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
