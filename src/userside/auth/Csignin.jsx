@@ -5,11 +5,34 @@ import { base_url } from "../../config/config";
 import { Eye, EyeOff, User, Briefcase } from "lucide-react";
 import SeoHead from "../../Seohead";
 
+const REMEMBER_KEY = "userRememberLogin";
+
+// Lets the browser's password manager save the login (stored encrypted by the browser, not by us).
+const saveCredentialToBrowser = async (email, password) => {
+  try {
+    if (window.PasswordCredential && navigator.credentials?.store) {
+      await navigator.credentials.store(new window.PasswordCredential({ id: email, password, name: email }));
+    }
+  } catch (err) {
+    console.warn("Could not save credential:", err);
+  }
+};
+
+const getRemembered = () => {
+  try {
+    return JSON.parse(localStorage.getItem(REMEMBER_KEY)) || null;
+  } catch {
+    return null;
+  }
+};
+
 const Csignin = () => {
-  const [remail, setEmail] = useState("");
+  const remembered = getRemembered();
+  const [remail, setEmail] = useState(remembered?.email || "");
   const [rpass, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState(""); 
+  const [activeTab, setActiveTab] = useState(remembered?.type || "");
+  const [rememberMe, setRememberMe] = useState(!!remembered);
   const [showPassword, setShowPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
 
@@ -44,6 +67,12 @@ const Csignin = () => {
       });
       const data = await response.json();
       if (data.success && data.token && data.user) {
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email: remail, type: activeTab }));
+          await saveCredentialToBrowser(remail, rpass);
+        } else {
+          localStorage.removeItem(REMEMBER_KEY);
+        }
         await login(data.token);
         const role = data.user.role?.toLowerCase();
         const id = data.user.id;
@@ -150,6 +179,8 @@ const Csignin = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
+              name="email"
+              autoComplete="username"
               value={remail}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
@@ -163,6 +194,8 @@ const Csignin = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                autoComplete="current-password"
                 value={rpass}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -178,7 +211,16 @@ const Csignin = () => {
               </button>
             </div>
 
-            <div className="flex justify-end mt-2">
+            <div className="flex items-center justify-between mt-2">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 accent-blue-500"
+                />
+                Remember me
+              </label>
               <button
                 type="button"
                 onClick={handleForgotPassword}

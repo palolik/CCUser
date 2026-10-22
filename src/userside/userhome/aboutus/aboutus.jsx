@@ -60,13 +60,13 @@ const Aboutus = () => {
           Cloud Company is a full-service software firm crafting custom web, mobile, and digital solutions for ambitious businesses worldwide.
         </p>
 
-        <div className="flex flex-wrap justify-center gap-10 md:gap-16">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 w-full max-w-sm md:max-w-none md:w-auto md:flex md:flex-wrap md:justify-center md:gap-16">
           {stats.map((s, i) => (
             <React.Fragment key={i}>
               <div className="text-center">
                 <strong className="block text-4xl font-serif font-semibold text-blue-50"
                   style={{ fontFamily: "'Playfair Display', serif" }}>{s.value}</strong>
-                <span className="text-xs text-blue-900/60 tracking-widest uppercase">{s.label}</span>
+                <span className="block text-[10px] sm:text-xs text-blue-300/60 tracking-wider sm:tracking-widest uppercase">{s.label}</span>
               </div>
               {i < stats.length - 1 && <div className="hidden md:block w-px h-12 self-center bg-white/10" />}
             </React.Fragment>
@@ -76,7 +76,7 @@ const Aboutus = () => {
 
       {/* ── MISSION ── */}
       <section className="py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
             <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">Our Mission</p>
             <h2 className="font-serif text-4xl font-semibold text-gray-900 leading-snug mb-6"
@@ -89,17 +89,17 @@ const Aboutus = () => {
           </div>
           <div className="rounded-3xl h-80 flex items-center justify-center relative overflow-hidden"
             style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a6e)" }}>
-           <img src={storyImg} alt="Illustration representing Cloud Company's mission of building software that supports business growth" loading="lazy" />
+           <img src={storyImg} alt="Illustration representing Cloud Company's mission of building software that supports business growth" loading="lazy" className="max-h-full max-w-full object-contain" />
           </div>
         </div>
       </section>
 
       {/* ── STORY ── */}
       <section className="py-24 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="rounded-3xl h-80 flex items-center justify-center relative overflow-hidden"
             style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a6e)" }}>
-           <img src={missionImg} alt="Illustration representing Cloud Company's story and journey since 2019" loading="lazy" />
+           <img src={missionImg} alt="Illustration representing Cloud Company's story and journey since 2019" loading="lazy" className="max-h-full max-w-full object-contain" />
           </div>
           <div>
             <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">Our Story</p>

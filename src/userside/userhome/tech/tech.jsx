@@ -102,7 +102,7 @@ const sections = [
 
 const Tech = () => {
   return (
-    <section className="py-24 px-6 bg-gray-50">
+    <section className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
 
       <div className="text-center mb-16">
         <p className="text-xs tracking-[3px] uppercase text-blue-500 font-medium mb-4">
@@ -138,13 +138,13 @@ const Tech = () => {
             <div className="hidden md:block w-px h-10 bg-gray-100 flex-shrink-0" />
 
             {/* Tech pills */}
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-2 w-full md:w-auto">
               {section.items.map((item, i) => (
                 <div key={i}
-                  className="flex items-center w-32 lg:w-40 gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 hover:bg-blue-50 hover:border-blue-200 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-default">
+                  className="flex items-center w-full min-w-0 md:w-auto md:min-w-[8rem] lg:min-w-[10rem] gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 hover:bg-blue-50 hover:border-blue-200 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-default">
                   <img src={item.src} alt={item.label}
-                    className="w-10 h-10 object-contain flex-shrink-0" />
-                  <span className="text-xs font-medium text-gray-600 whitespace-nowrap group-hover:text-gray-700">
+                    className="w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0" />
+                  <span className="min-w-0 text-xs font-medium leading-tight text-gray-600 md:whitespace-nowrap group-hover:text-gray-700">
                     {item.label}
                   </span>
                 </div>

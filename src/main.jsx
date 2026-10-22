@@ -20,6 +20,7 @@ import Csignin from './userside/auth/Csignin';
 import Clientprofile from './userside/Client/Cprofile';
 import PackDetails from './userside/packages/packdetails';
 import { base_url } from './config/config';
+import ErrorPage from './userside/ErrorPage/ErrorPage';
 import HomePortfolio from './userside/userhome/homeportfolio/homeportfolio';
 import { HelmetProvider } from 'react-helmet-async'
 import PortfolioDetail from './userside/userhome/homeportfolio/PortfolioDetails';
@@ -36,6 +37,9 @@ import PushManager from './userside/utils/PushManager';
 
 
 const router = createBrowserRouter([
+  {
+  errorElement: <ErrorPage />,
+  children: [
   {
     path: "/",
     element: <Viewer></Viewer>,
@@ -150,6 +154,10 @@ const router = createBrowserRouter([
 
 
 
+
+  { path: "*", element: <ErrorPage /> },
+  ],
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

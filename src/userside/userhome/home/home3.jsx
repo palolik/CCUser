@@ -53,7 +53,7 @@ const Home3 = () => {
 
   return (
     <section
-      className="relative w-full min-h-screen flex overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col lg:flex-row overflow-hidden"
       style={{
         background:
           "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
@@ -72,8 +72,8 @@ const Home3 = () => {
 
       {/* ── LEFT: Text (always 55% on desktop, full on mobile) ── */}
       <div className="relative z-10 flex flex-col justify-center
-        w-full lg:w-[55%] flex-shrink-0
-        px-4 pt-2 pb-20 lg:px-18 lg:pt-0 lg:pl-20">
+        w-full lg:w-[55%] flex-1 lg:flex-none lg:flex-shrink-0
+        px-4 pt-10 pb-6 lg:px-18 lg:pt-0 lg:pb-20 lg:pl-20">
 
         {/* Badge */}
         <div className="inline-flex items-center gap-2 self-start bg-blue-500/10 border border-blue-500/25
@@ -109,7 +109,7 @@ const Home3 = () => {
         </div>
 
         {/* Slide dots */}
-        <div className="flex gap-2 mt-16">
+        <div className="flex gap-2 mt-10 lg:mt-16">
           {slides.map((_, i) => (
             <button key={i} onClick={() => { clearInterval(timerRef.current); goTo(i); }}
               className={`h-2 rounded-full transition-all duration-300 border-none cursor-pointer ${i === current
@@ -135,9 +135,9 @@ const Home3 = () => {
         </div>
       </div>
 
-      {/* Mobile image — below text, safe area */}
-      <div className="lg:hidden absolute bottom-0 left-0 right-0 h-[38vh] flex items-end justify-center
-        pointer-events-none px-6 pb-2">
+      {/* Mobile image — in normal flow below text so it never covers the buttons */}
+      <div className="lg:hidden relative z-10 h-[34vh] flex items-end justify-center
+        pointer-events-none px-6 pb-4">
         <img
           key={"m" + current}
           src={s.image}
