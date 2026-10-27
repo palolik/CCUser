@@ -5,6 +5,7 @@ import Navber from '../navBer/navber';
 import Footer from '../footer/footer';
 import SeoHead from '../../Seohead';
 import { Shimmer } from '../utils/Shimmer';
+import { formatBDT } from '../utils/currency';
 
 const generateRefCode = () => {
   const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -146,7 +147,7 @@ const handleConfirmPayment = async () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Subtotal</p>
-                  <p className="text-slate-800 font-bold text-base sm:text-lg">${orderSummary.subtotal?.toFixed(2)}</p>
+                  <p className="text-slate-800 font-bold text-base sm:text-lg">{formatBDT(orderSummary.subtotal, { decimals: 2 })}</p>
                 </div>
              \
                 {orderSummary.discount > 0 && (
@@ -157,7 +158,7 @@ const handleConfirmPayment = async () => {
                 )}
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Total</p>
-                  <p className="text-blue-600 font-black text-xl sm:text-2xl">${orderSummary.totalPrice?.toFixed(2)}</p>
+                  <p className="text-blue-600 font-black text-xl sm:text-2xl">{formatBDT(orderSummary.totalPrice, { decimals: 2 })}</p>
                 </div>
               </div>
             </section>

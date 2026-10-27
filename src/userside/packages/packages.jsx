@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
 import { Shimmer, ShimmerGrid } from "../utils/Shimmer";
+import { formatBDT, hasExpress, packageUrl } from "../utils/currency";
 
 const Packages = ({ category = [], packages = [], loading = false }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -17,21 +18,22 @@ const Packages = ({ category = [], packages = [], loading = false }) => {
     setIsLoggedIn(!!localStorage.getItem("authToken"));
   }, [category]);
 
- const handleProductClick = (id) => {
-  if (!id) return;
+  // Clicks are counted by _id; the URL uses the SEO slug.
+  const trackClick = (id) => {
+    fetch(`${base_url}/packageclicks/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ incrementBy: 1 }),
+    }).catch((e) => {
+      console.error("Package click tracking failed:", e);
+    });
+  };
 
-
-  navigate(`/packdetails/${id}`);
-
-
-  fetch(`${base_url}/packageclicks/${id}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ incrementBy: 1 }),
-  }).catch((e) => {
-    console.error("Package click tracking failed:", e);
-  });
-};
+  const handleProductClick = (pack) => {
+    if (!pack?._id) return;
+    navigate(packageUrl(pack));
+    trackClick(pack._id);
+  };
 
   const handlePurchaseClick = (pack) => {
     if (!isLoggedIn) return toast.error("Please log in first to make a purchase!");
@@ -122,24 +124,33 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
               style={pack.featured ? { background: "linear-gradient(160deg,#050d1f,#0d1b3e)" } : {}}>
 
               {/* Top */}
-              <div className="p-7 pb-5 cursor-pointer" onClick={() => handleProductClick(pack._id)}>
+              <div className="p-7 pb-5 cursor-pointer" onClick={() => handleProductClick(pack)}>
                 <h3 className={`text-base font-medium text-center mb-5 ${pack.featured ? "text-blue-50" : "text-gray-900"}`}>
-                  {pack.packageName}
+                  {/* Real <a href> so crawlers can follow it; the card's onClick still covers the rest */}
+                  <Link to={packageUrl(pack)} onClick={(e) => { e.stopPropagation(); trackClick(pack._id); }}>
+                    {pack.packageName}
+                  </Link>
                 </h3>
 
                 {/* Price */}
                 <div className="text-center mb-3">
                   <span className={`font-serif text-5xl font-semibold ${pack.featured ? "text-blue-300" : "text-blue-600"}`}
                     style={{ fontFamily: "'Playfair Display', serif" }}>
-                    ${pack.packagePrice}
+                    {formatBDT(pack.packagePrice)}
                   </span>
                   <span className="text-gray-400 text-sm font-light"> /plan</span>
                 </div>
                 <p className={`text-center text-xs mb-5 ${pack.featured ? "text-blue-300/60" : "text-gray-400"}`}>
-                  Express:{" "}
-                  <span className={`font-medium ${pack.featured ? "text-blue-300/60" : "text-blue-500"}`}>
-                    ${Number(pack.packagePrice) + Number(pack.expressDeliveryPrice)}
-                  </span>
+                  {hasExpress(pack) ? (
+                    <>
+                      Express:{" "}
+                      <span className={`font-medium ${pack.featured ? "text-blue-300/60" : "text-blue-500"}`}>
+                        {formatBDT(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}
+                      </span>
+                    </>
+                  ) : (
+                    <>Delivery in {pack.deliveryTime} days</>
+                  )}
                 </p>
 
                 {/* Divider */}

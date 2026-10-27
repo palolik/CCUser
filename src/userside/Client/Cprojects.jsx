@@ -13,6 +13,7 @@ import { base_url } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 import ProfilePacks from "../packages/profilepacks";
 import { Shimmer, ShimmerList } from "../utils/Shimmer";
+import { formatBDT } from "../utils/currency";
 
 const Cproject = ({ eid }) => {
   const { user } = useContext(AuthContext);
@@ -172,10 +173,10 @@ const Cproject = ({ eid }) => {
                 {isCustom && (project.offeringPrice || project.packagePrice) && (
                   <div className="px-4 pb-2 flex items-center gap-4 text-xs text-gray-500">
                     {project.offeringPrice && (
-                      <span>Offer: <strong className="text-gray-700">${project.offeringPrice}</strong></span>
+                      <span>Offer: <strong className="text-gray-700">{formatBDT(project.offeringPrice)}</strong></span>
                     )}
                     {project.packagePrice && (
-                      <span>Final: <strong className="text-blue-600">${project.packagePrice}</strong></span>
+                      <span>Final: <strong className="text-blue-600">{formatBDT(project.packagePrice)}</strong></span>
                     )}
                     {project.deliveryTime && (
                       <span>⏱ <strong className="text-gray-700">{project.deliveryTime}d</strong></span>
@@ -266,7 +267,7 @@ const Cproject = ({ eid }) => {
                       }}
                       className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-semibold transition-all duration-150 shadow-sm"
                     >
-                      Pay Now — ${project.packagePrice}
+                      Pay Now — {formatBDT(project.packagePrice)}
                     </button>
                   </div>
                 )}
@@ -290,7 +291,7 @@ const Cproject = ({ eid }) => {
                       }}
                       className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-semibold transition-all duration-150 shadow-sm"
                     >
-                      Pay Now — ${project.sellPrice}
+                      Pay Now — {formatBDT(project.sellPrice)}
                     </button>
                   </div>
                 )}

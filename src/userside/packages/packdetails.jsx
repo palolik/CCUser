@@ -9,6 +9,9 @@ import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import Comments from '../Comments/comments';
 import { Shimmer, ShimmerText } from '../utils/Shimmer';
+import { formatBDT, hasExpress, packageUrl } from '../utils/currency';
+
+const SITE_URL = 'https://cloudcompany.cc';
 
 const stripHtmlToDescription = (html, maxLength = 160) => {
   if (!html) return '';
@@ -31,6 +34,9 @@ const PackDetails = () => {
         if (!response.ok) throw new Error('Failed to fetch package data');
         const data = await response.json();
         setPackageData(data);
+        // Old /packdetails/<id> links move to the slug URL so only one URL gets indexed.
+        const slug = data?.package?.slug;
+        if (slug && slug !== id) navigate(`/packdetails/${slug}`, { replace: true });
       } catch (error) {
         setError(error.message);
       } finally {
@@ -104,35 +110,68 @@ const PackDetails = () => {
   const pkg = packageData?.package;
 
   const metaDescription = pkg
-    ? stripHtmlToDescription(pkg.packageDetails) ||
+    ? pkg.metaDescription ||
+      stripHtmlToDescription(pkg.packageDetails) ||
       `${pkg.packageName} — delivered in ${pkg.deliveryTime} days by Cloud Company.`
     : undefined;
 
-  const productJsonLd = pkg
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'Service',
-        name: pkg.packageName,
-        description: metaDescription,
-        provider: { '@type': 'Organization', name: 'Cloud Company' },
-        offers: {
-          '@type': 'Offer',
-          price: pkg.packagePrice,
-          priceCurrency: 'USD',
-          availability: 'https://schema.org/InStock',
+  const canonicalPath = pkg ? packageUrl(pkg) : undefined;
+  const faqs = (pkg?.faqs || []).filter((f) => f?.q && f?.a);
+  const showExpress = hasExpress(pkg);
+
+  const jsonLd = pkg
+    ? [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Service',
+          name: pkg.packageName,
+          description: metaDescription,
+          serviceType: pkg.category,
+          url: `${SITE_URL}${canonicalPath}`,
+          ...(pkg.packageCover && { image: pkg.packageCover }),
+          areaServed: { '@type': 'Country', name: 'Bangladesh' },
+          provider: { '@type': 'Organization', name: 'Cloud Company', url: SITE_URL },
+          offers: {
+            '@type': 'Offer',
+            price: String(Number(pkg.packagePrice) || 0),
+            priceCurrency: 'BDT',
+            availability: 'https://schema.org/InStock',
+            url: `${SITE_URL}${canonicalPath}`,
+          },
         },
-      }
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+            { '@type': 'ListItem', position: 2, name: 'Packages', item: `${SITE_URL}/buypackage` },
+            { '@type': 'ListItem', position: 3, name: pkg.packageName, item: `${SITE_URL}${canonicalPath}` },
+          ],
+        },
+        ...(faqs.length
+          ? [{
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: faqs.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+              })),
+            }]
+          : []),
+      ]
     : undefined;
 
   return (
     <>
       {pkg && (
         <SeoHead
-          title={pkg.packageName}
+          title={pkg.metaTitle || pkg.packageName}
           description={metaDescription}
-          canonical={`/packdetails/${id}`}
+          canonical={canonicalPath}
           ogImage={pkg.packageCover || undefined}
-          jsonLd={productJsonLd}
+          keywords={pkg.keywords}
+          jsonLd={jsonLd}
         />
       )}
       <style>{`
@@ -167,7 +206,7 @@ const PackDetails = () => {
             {/* ── Hero Cover ── */}
             <div className="w-full h-48 sm:h-64 md:h-96 overflow-hidden relative fade-in">
               <img
-                src={pkg.packageCover === '' ? pkg.packageCover : cover}
+                src={pkg.packageCover || cover}
                 className="w-full h-full object-cover"
                 alt={pkg.packageName}
               />
@@ -188,12 +227,12 @@ const PackDetails = () => {
               {/* ── Pricing ── */}
               <section className="fade-in fade-in-1">
                 <p className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-2 sm:mb-4">Available plans</p>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+                <div className={`grid ${showExpress ? 'grid-cols-2' : 'grid-cols-1 max-w-sm'} gap-3 sm:gap-4 md:gap-5`}>
                   {/* Regular */}
                   <div className="price-card bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6 flex flex-col gap-1">
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400">Regular</span>
                     <div className="flex items-end gap-1 mt-1 sm:mt-2">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">${pkg.packagePrice}</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{formatBDT(pkg.packagePrice)}</span>
                     </div>
                     <div className="divider my-2 sm:my-3" />
                     <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 flex-wrap">
@@ -205,6 +244,7 @@ const PackDetails = () => {
                   </div>
 
                   {/* Express */}
+                  {showExpress && (
                   <div className="price-card  rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6 flex flex-col gap-1 relative overflow-hidden" style={{
     background:
       "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
@@ -214,7 +254,7 @@ const PackDetails = () => {
                     </div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1 sm:mt-2">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">${Number(pkg.expressDeliveryPrice) + Number(pkg.packagePrice)}</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{formatBDT(Number(pkg.expressDeliveryPrice) + Number(pkg.packagePrice))}</span>
                     </div>
                     <div className="h-px bg-blue-500/50 my-2 sm:my-3" />
                     <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-blue-100 flex-wrap">
@@ -224,6 +264,7 @@ const PackDetails = () => {
                       <span>Delivery in <span className="font-semibold text-white">{pkg.expressDeliveryTime} days</span></span>
                     </div>
                   </div>
+                  )}
                 </div>
               </section>
 
@@ -263,6 +304,24 @@ const PackDetails = () => {
                   dangerouslySetInnerHTML={{ __html: pkg.packageRequirements }}
                 />
               </section>
+
+              {/* ── FAQ (also emitted as FAQPage schema above) ── */}
+              {faqs.length > 0 && (
+                <section className="fade-in fade-in-4 bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+                  <h2 className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-3 sm:mb-4">Frequently Asked Questions</h2>
+                  <div className="divide-y divide-slate-100">
+                    {faqs.map((f, i) => (
+                      <details key={i} className="group py-3 sm:py-4" open={i === 0}>
+                        <summary className="flex items-start justify-between gap-3 cursor-pointer list-none font-semibold text-slate-800 text-sm sm:text-base">
+                          <h3>{f.q}</h3>
+                          <span className="text-blue-500 transition-transform group-open:rotate-45 text-lg leading-none flex-shrink-0">+</span>
+                        </summary>
+                        <p className="mt-2 text-slate-600 text-sm sm:text-base leading-relaxed">{f.a}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* ── Reviews ── */}
               {packageData.feedbacks && packageData.feedbacks.length > 0 && (
@@ -311,7 +370,8 @@ const PackDetails = () => {
 
               {/* ── Comments ── */}
               <section className="fade-in fade-in-5">
-                <Comments productId={id} />
+                {/* Comments are keyed by package _id, not the URL slug */}
+                <Comments productId={pkg._id} />
               </section>
 
               {/* ── CTA ── */}

@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Shimmer, ShimmerText, ShimmerList } from "../utils/Shimmer";
+import { formatBDT, formatBDTPlain } from "../utils/currency";
 
 // inside component
 const Cuser = () => {
@@ -243,7 +244,7 @@ const generateInvoicePDF = (order) => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...muted);
     doc.text("Subtotal", pageW - marginX - 70, y + 10);
-    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 10, { align: "right" });
+    doc.text(formatBDTPlain(order.sellPrice), pageW - marginX - 8, y + 10, { align: "right" });
 
     doc.setDrawColor(...border);
     doc.line(pageW - marginX - 70, y + 16, pageW - marginX - 8, y + 16);
@@ -254,7 +255,7 @@ const generateInvoicePDF = (order) => {
     doc.text("Total", pageW - marginX - 70, y + 26);
 
     doc.setFontSize(14);
-    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 26, { align: "right" });
+    doc.text(formatBDTPlain(order.sellPrice), pageW - marginX - 8, y + 26, { align: "right" });
 
     // Notes
     doc.setFontSize(8);
@@ -374,7 +375,7 @@ const generateInvoicePDF = (order) => {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-700 truncate">{order.projectTitle}</p>
                     <p className="text-[10px] text-gray-400 font-mono truncate">#{order._id.slice(-8)}</p>
-                    <p className="text-xs font-bold text-blue-600 mt-0.5">${parseFloat(order.sellPrice).toFixed(2)}</p>
+                    <p className="text-xs font-bold text-blue-600 mt-0.5">{formatBDT(order.sellPrice, { decimals: 2 })}</p>
                   </div>
                   <button
                     onClick={() => generateInvoicePDF(order)}
