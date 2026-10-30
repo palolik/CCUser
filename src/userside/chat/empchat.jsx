@@ -65,7 +65,7 @@ const SeenLabel = ({ read }) => (
     : <span className="text-[10px] text-blue-200 mt-0.5">Sent</span>
 );
 
-const Echat = ({ selectedTaskId }) => {
+const Echat = ({ selectedTaskId, className, embedded = false }) => {
   const { user } = useContext(AuthContext);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [messages, setMessages]       = useState([]);
@@ -241,8 +241,11 @@ useEffect(() => {
 
   const lastEmpMsgIndex = messages.map(m => m.sender).lastIndexOf('emp');
 
-  const ChatWindow = (
-    <div className="flex flex-col h-[85vh] lg:w-[80vh] bg-white md:w-full rounded-sm overflow-hidden border border-gray-50">
+  // className sizes the desktop window; the mobile popup fills its box.
+  // embedded renders just the window (no header) inside a caller's frame,
+  // e.g. the floating chat windows on the task board.
+  const chatWindow = (sizeClass) => (
+    <div className={`flex flex-col bg-white rounded-sm overflow-hidden border border-gray-50 ${sizeClass}`}>
       <div className="flex flex-col h-full">
         {!selectedTaskId ? (
           <div className="flex flex-col items-center justify-center h-full min-h-[70vh] text-center p-6 bg-gray-50 rounded-sm border border-dashed border-gray-200">
@@ -252,10 +255,12 @@ useEffect(() => {
           </div>
         ) : (
           <>
-            <div className="px-5 py-4 w-full border-b border-gray-100 justify-between flex flex-row text-black">
-              <div className="text-lg md:text-xl font-semibold text-gray-700">Chat</div>
-              <div className="text-sm md:text-base text-gray-500 font-medium">Task: {selectedTaskId}</div>
-            </div>
+            {!embedded && (
+              <div className="px-5 py-4 w-full border-b border-gray-100 justify-between flex flex-row text-black">
+                <div className="text-lg md:text-xl font-semibold text-gray-700">Chat</div>
+                <div className="text-sm md:text-base text-gray-500 font-medium">Task: {selectedTaskId}</div>
+              </div>
+            )}
 
             <div
               ref={scrollContainerRef}
@@ -361,10 +366,12 @@ useEffect(() => {
     </div>
   );
 
+  if (embedded) return chatWindow(className || "h-full w-full");
+
   return (
     <>
       <div className="hidden w-full lg:flex">
-        {selectedTaskId ? ChatWindow : (
+        {selectedTaskId ? chatWindow(className || "h-[85vh] lg:w-[80vh] md:w-full") : (
           <div className="flex flex-col items-center justify-center h-full min-h-[70vh] text-center p-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
             <div className="text-5xl mb-4">💬</div>
             <p className="text-lg font-semibold text-gray-700 mb-1">No task selected</p>
@@ -383,7 +390,7 @@ useEffect(() => {
           </button>
           {isMobileChatOpen && (
             <div className="fixed bottom-20 right-2 w-[90vw] h-[80vh] bg-white rounded-md shadow-md overflow-hidden border border-gray-200">
-              {ChatWindow}
+              {chatWindow("h-full w-full")}
             </div>
           )}
         </div>

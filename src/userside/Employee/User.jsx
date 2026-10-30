@@ -79,7 +79,7 @@ const Euser = () => {
 
   if (!userData)
     return (
-      <div className="px-4 lg:px-0">
+      <div className="w-full lg:w-auto">
         <div className="w-full lg:w-[400px] lg:mt-2 p-4 lg:h-[85vh] bg-white rounded-md flex-shrink-0 flex flex-col gap-4" role="status" aria-label="Loading">
           <div className="flex flex-row items-center gap-4">
             <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
@@ -101,7 +101,7 @@ const Euser = () => {
   const totalCC             = tasks.reduce((s, t) => s + parseInt(t.tcc   || 0), 0);
 
   return (
-    <div className="px-4 lg:px-0">
+    <div className="w-full lg:w-auto">
       <div className="w-full lg:w-[400px] lg:mt-2 p-4 lg:h-[85vh] 
       border-b border-gray-100 bg-white rounded-md flex-shrink-0 
       overflow-hidden transition-all hover:shadow-xl flex flex-col">

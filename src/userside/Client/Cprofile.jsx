@@ -70,7 +70,7 @@ const ClientProfile = () => {
           <Shimmer className="h-8 w-32 rounded" />
           <Shimmer className="h-8 w-8 rounded-full" />
         </div>
-        <div className="lg:w-full lg:px-10 px-4 py-6 flex lg:flex-row flex-col gap-6">
+        <div className="lg:w-full lg:px-10 px-3 py-3 lg:py-6 flex lg:flex-row flex-col gap-3 lg:gap-6">
           <div className="w-full lg:w-[400px] p-4 bg-white rounded-md flex-shrink-0 flex flex-col gap-4">
             <div className="flex flex-row items-center gap-4">
               <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
@@ -93,10 +93,10 @@ const ClientProfile = () => {
   if (!employee) return <p>No client found.</p>;
 
   return (
-    <div className="overflow-hidden h-100vm  bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="overflow-hidden min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <SeoHead title="Client Profile" noIndex />
       <Navber employee={employee} />
-      <div className="lg:w-full lg:px-10 sm:mx-1 flex lg:flex-row flex-col lg:items-start h-screen">
+      <div className="w-full px-3 pt-3 pb-4 gap-3 lg:px-10 lg:pt-0 lg:pb-0 lg:gap-0 flex lg:flex-row flex-col lg:items-start">
         <Cuser employee={employee} />
         <Cproject eid={id} />
       </div>

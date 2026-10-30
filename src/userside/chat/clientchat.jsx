@@ -72,7 +72,7 @@ const AttachmentPreview = ({ attachments, isClient }) => {
   );
 };
 
-const Cchat = ({ selectedProjectId, isChatTabActive = true }) => {
+const Cchat = ({ selectedProjectId, isChatTabActive = true, embedded = false }) => {
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
@@ -182,7 +182,7 @@ const shouldPlayNotification = () => {
   const browserTabHidden = document.hidden;
 
   const isMobileScreen = window.innerWidth < 1024;
-  const mobileChatClosed = isMobileScreen && !isMobileChatOpenRef.current;
+  const mobileChatClosed = !embedded && isMobileScreen && !isMobileChatOpenRef.current;
 
   const notOnChatTab = !isChatTabActiveRef.current;
 
@@ -441,8 +441,10 @@ setMessages((prevMessages) => {
     }
   };
 
+  // embedded renders just the window (no header, fills its box) inside a
+  // caller's frame, e.g. the floating chat windows on the client profile.
   const ChatWindow = (
-    <div className="flex flex-col h-[80vh] w-full md:w-full bg-white rounded-sm  overflow-hidden border border-gray-50">
+    <div className={`flex flex-col ${embedded ? "h-full" : "h-[80vh]"} w-full md:w-full bg-white rounded-sm  overflow-hidden border border-gray-50`}>
       <div className="flex flex-col h-full">
         {!selectedProjectId ? (
           <div className="flex flex-col items-center justify-center h-full min-h-[70vh] text-center p-6 bg-gray-50 rounded-sm border border-dashed border-gray-200">
@@ -452,10 +454,12 @@ setMessages((prevMessages) => {
           </div>
         ) : (
           <>
-            <div className="px-5 py-4 border-b border-gray-100 justify-between flex flex-row text-black ">
-              <h2 className=" font-semibold tracking-wide">Chat</h2>
-              <p className=" text-xs mt-0.5"> Project: {selectedProjectId}</p>
-            </div>
+            {!embedded && (
+              <div className="px-5 py-4 border-b border-gray-100 justify-between flex flex-row text-black ">
+                <h2 className=" font-semibold tracking-wide">Chat</h2>
+                <p className=" text-xs mt-0.5"> Project: {selectedProjectId}</p>
+              </div>
+            )}
 
             <div
               ref={scrollContainerRef}
@@ -589,6 +593,8 @@ setMessages((prevMessages) => {
       </div>
     </div>
   );
+
+  if (embedded) return <div key={selectedProjectId} className="w-full h-full">{ChatWindow}</div>;
 
   return (
     <>
