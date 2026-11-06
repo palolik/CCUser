@@ -10,6 +10,7 @@ import { base_url } from '../../config/config';
 import { GiDiceSixFacesFive } from 'react-icons/gi';
 import SeoHead from '../../Seohead';
 import { Shimmer, ShimmerText } from '../utils/Shimmer';
+import { formatBDT, hasExpress } from '../utils/currency';
 
 const Requireddetails = () => {
   const { user } = useContext(AuthContext);
@@ -171,6 +172,7 @@ const Requireddetails = () => {
 
   const { packageCover, packageName, packageContents, packageRequirements,
     deliveryTime, packagePrice, expressDeliveryTime, expressDeliveryPrice } = packageData;
+  const showExpress = hasExpress(packageData);
 
   return (
     <>
@@ -231,12 +233,12 @@ const Requireddetails = () => {
               {/* Pricing */}
               <section className="fade-in fade-in-1">
                 <p className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400 mb-2 sm:mb-3">Available Plans</p>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className={`grid ${showExpress || loading ? 'grid-cols-2' : 'grid-cols-1 max-w-sm'} gap-3 sm:gap-4`}>
                   {/* Regular */}
                   <div className="price-card bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1">
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400">Regular</span>
                     <div className="flex items-end gap-1 mt-1">
-                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">${packagePrice}</span>}
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{formatBDT(packagePrice)}</span>}
                     </div>
                     <div className="divider my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 flex-wrap">
@@ -248,6 +250,7 @@ const Requireddetails = () => {
                   </div>
 
                   {/* Express */}
+                  {(showExpress || loading) && (
                   <div className="price-card  rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1 relative overflow-hidden" style={{
     background:
       "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)",
@@ -255,7 +258,7 @@ const Requireddetails = () => {
                     <div className="absolute top-2 right-2 bg-blue-500/40 text-white text-[8px] sm:text-[10px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full">Fast Track</div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1">
-                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded opacity-30" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">${Number(expressDeliveryPrice) + Number(packagePrice)}</span>}
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded opacity-30" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{formatBDT(Number(expressDeliveryPrice) + Number(packagePrice))}</span>}
                     </div>
                     <div className="h-px bg-blue-500/50 my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-blue-100 flex-wrap">
@@ -265,6 +268,7 @@ const Requireddetails = () => {
                       {loading ? <Shimmer className="h-3 w-24 rounded opacity-30" /> : <span>Delivery in <span className="font-semibold text-white">{expressDeliveryTime} days</span></span>}
                     </div>
                   </div>
+                  )}
                 </div>
               </section>
 
@@ -394,13 +398,13 @@ const Requireddetails = () => {
                 {/* Price breakdown */}
                 <div className="bill-row text-sm mb-3">
                   <span className="text-slate-500">Base Price</span>
-                  <span className="font-semibold text-slate-800">${packagePrice}</span>
+                  <span className="font-semibold text-slate-800">{formatBDT(packagePrice)}</span>
                 </div>
 
                 {isExpress && (
                   <div className="bill-row text-sm mb-3">
                     <span className="text-slate-500">Express Fee</span>
-                    <span className="font-semibold text-blue-600">+${expressDeliveryPrice}</span>
+                    <span className="font-semibold text-blue-600">+{formatBDT(expressDeliveryPrice)}</span>
                   </div>
                 )}
 
@@ -408,10 +412,11 @@ const Requireddetails = () => {
 
                 <div className="bill-row text-sm mb-4">
                   <span className="text-slate-500">Subtotal</span>
-                  <span className="font-bold text-slate-800">${totalPrice.toFixed(2)}</span>
+                  <span className="font-bold text-slate-800">{formatBDT(totalPrice, { decimals: 2 })}</span>
                 </div>
 
                 {/* Express toggle */}
+                {showExpress && (
                 <button
                   onClick={() => { setIsExpress(p => !p); setDiscountedPrice(null); setCouponStatus(null); }}
                   disabled={!showBill}
@@ -430,6 +435,7 @@ const Requireddetails = () => {
                     {isExpress ? 'Cancel Express Delivery' : 'Upgrade to Express'}
                   </span>
                 </button>
+                )}
 
                 {/* Coupon */}
                 <div className="mb-4">
@@ -472,9 +478,9 @@ const Requireddetails = () => {
                   <span className="text-slate-500 text-sm">Net Total</span>
                   <div className="text-right">
                     {discountedPrice !== null && (
-                      <p className="text-xs text-slate-400 line-through">${totalPrice.toFixed(2)}</p>
+                      <p className="text-xs text-slate-400 line-through">{formatBDT(totalPrice, { decimals: 2 })}</p>
                     )}
-                    <p className="text-2xl font-bold text-slate-900">${netTotal.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-slate-900">{formatBDT(netTotal, { decimals: 2 })}</p>
                   </div>
                 </div>
 

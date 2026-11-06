@@ -1,23 +1,27 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import PropTypes from 'prop-types';
 import { jwtDecode } from "jwt-decode";
 import { unregisterPush } from "../utils/push";
 
 export const AuthContext = createContext(null);
 
-const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
-
-    useEffect(() => {
+// Read the saved login synchronously so the first render already knows who
+// is logged in. Loading it in an effect left user null for one render, and
+// pages that send logged-out visitors home (profiles) redirected on refresh.
+function readStoredAuth() {
+    try {
         const storedToken = localStorage.getItem("authToken");
         const storedUser = localStorage.getItem("authUser");
+        if (storedToken && storedUser) return { token: storedToken, user: JSON.parse(storedUser) };
+    } catch {
+        // storage blocked or corrupt: treat as logged out
+    }
+    return { token: null, user: null };
+}
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser)); 
-        }
-    }, []);
+const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(() => readStoredAuth().user);
+    const [token, setToken] = useState(() => readStoredAuth().token);
 
     const login = (authToken) => {
         const decodedUser = jwtDecode(authToken);

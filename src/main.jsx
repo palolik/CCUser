@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import Viewer from './userside/userhome/viewer';
 import Signin from './userside/auth/Csignin';
 import SignUp from './userside/auth/Csignup';
@@ -24,9 +24,16 @@ import ErrorPage from './userside/ErrorPage/ErrorPage';
 import { PageShimmer, RouteLoadingBar } from './userside/utils/Shimmer';
 
 // Wraps every route: shows a top loading bar while the next page's data loads.
+// The floating social links cover the task board on profile pages.
+const SocialBar = () => {
+  const { pathname } = useLocation();
+  return /^\/(employee|client|marketer)profile\//.test(pathname) ? null : <Social />;
+};
+
 const RootLayout = () => (
   <>
     <RouteLoadingBar />
+    <SocialBar />
     <Outlet />
   </>
 );
@@ -169,7 +176,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>
       <AuthProvider>
-        <Social />
         <SupportChat />
         <PushManager />
         <RouterProvider router={router} fallbackElement={<PageShimmer />} />

@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
 import { Shimmer, ShimmerText } from "../utils/Shimmer";
+import { formatBDT, hasExpress, packageUrl } from "../utils/currency";
 
 const ProfilePacks = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -58,17 +59,18 @@ const ProfilePacks = () => {
     setIsLoggedIn(!!token);
   }, []);
 
-  const handleProductClick = async (id) => {
+  // Clicks are counted by _id; the URL uses the SEO slug.
+  const handleProductClick = async (pack) => {
     try {
-      await fetch(`${base_url}/packageclicks/${id}`, {
+      await fetch(`${base_url}/packageclicks/${pack._id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ incrementBy: 1 }),
       });
-      navigate(`/packdetails/${id}`);
+      navigate(packageUrl(pack));
     } catch (error) {
       console.error("Error updating click count:", error);
-      navigate(`/packdetails/${id}`);
+      navigate(packageUrl(pack));
     }
   };
 
@@ -167,7 +169,7 @@ const ProfilePacks = () => {
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-2 border border-gray-100 flex flex-col"
               >
                 <div
-                  onClick={() => handleProductClick(pack._id)}
+                  onClick={() => handleProductClick(pack)}
                   className="cursor-pointer p-6 flex flex-col flex-grow"
                 >
                   <h3 className="text-2xl font-semibold text-gray-800 text-center mb-4">
@@ -175,10 +177,12 @@ const ProfilePacks = () => {
                   </h3>
 
                   <div className="text-center mb-4">
-                    <span className="text-blue-600 text-5xl font-bold">${pack.packagePrice}</span>
+                    <span className="text-blue-600 text-5xl font-bold">{formatBDT(pack.packagePrice)}</span>
                     <span className="text-gray-600 text-lg">/plan</span>
                     <p className="text-blue-500 mt-2">
-                      Express: ${Number(pack.packagePrice) + Number(pack.expressDeliveryPrice)}
+                      {hasExpress(pack)
+                        ? `Express: ${formatBDT(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}`
+                        : `Delivery in ${pack.deliveryTime} days`}
                     </p>
                   </div>
 

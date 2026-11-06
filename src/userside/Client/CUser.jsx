@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Shimmer, ShimmerText, ShimmerList } from "../utils/Shimmer";
+import { formatBDT, formatBDTPlain } from "../utils/currency";
 
 // inside component
 const Cuser = () => {
@@ -243,7 +244,7 @@ const generateInvoicePDF = (order) => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...muted);
     doc.text("Subtotal", pageW - marginX - 70, y + 10);
-    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 10, { align: "right" });
+    doc.text(formatBDTPlain(order.sellPrice), pageW - marginX - 8, y + 10, { align: "right" });
 
     doc.setDrawColor(...border);
     doc.line(pageW - marginX - 70, y + 16, pageW - marginX - 8, y + 16);
@@ -254,7 +255,7 @@ const generateInvoicePDF = (order) => {
     doc.text("Total", pageW - marginX - 70, y + 26);
 
     doc.setFontSize(14);
-    doc.text(`$${parseFloat(order.sellPrice || 0).toFixed(2)}`, pageW - marginX - 8, y + 26, { align: "right" });
+    doc.text(formatBDTPlain(order.sellPrice), pageW - marginX - 8, y + 26, { align: "right" });
 
     // Notes
     doc.setFontSize(8);
@@ -297,8 +298,8 @@ const generateInvoicePDF = (order) => {
 };
   if (!userData)
     return (
-      <div className="px-4 lg:px-0">
-        <div className="w-full lg:w-[400px] lg:mt-6 p-4 bg-white rounded-md flex flex-col gap-4" role="status" aria-label="Loading">
+      <div className="w-full lg:w-auto">
+        <div className="w-full lg:w-[400px] lg:mt-6 p-4 lg:h-[85vh] bg-white rounded-md flex flex-col gap-4" role="status" aria-label="Loading">
           <div className="flex flex-row items-center gap-4">
             <Shimmer className="lg:w-20 lg:h-20 h-16 w-16 rounded-full shrink-0" />
             <div className="flex-1 min-w-0">
@@ -315,8 +316,8 @@ const generateInvoicePDF = (order) => {
     );
 
   return (
-    <div className="px-4 lg:px-0" >
-      <div className="w-full lg:w-[400px] lg:mt-6  p-4 max-h-[85vh] border-b border-gray-100  bg-white rounded-md  flex-shrink-0 overflow-hidden transition-all hover:shadow-xl  flex flex-col ">
+    <div className="w-full lg:w-auto">
+      <div className="w-full lg:w-[400px] lg:mt-6 p-4 lg:h-[85vh] border-b border-gray-100 bg-white rounded-md flex-shrink-0 overflow-hidden transition-all hover:shadow-xl flex flex-col">
 
       
         <div className="flex flex-row items-center gap-4 "   onClick={() => setIsOpen(!isOpen)}>
@@ -357,7 +358,8 @@ const generateInvoicePDF = (order) => {
         </div>
 
       
-        <div className={ ` px-2  ${isOpen ? "block" : "hidden"} md:block`}>
+        {/* Orders fill the rest of the card on desktop and scroll inside it */}
+        <div className={ ` px-2  ${isOpen ? "block" : "hidden"} md:block lg:flex lg:flex-col lg:flex-1 lg:min-h-0`}>
           <p className="text-[17px] font-semibold text-gray-800 mb-3 border-t border-gray-100 pt-3">
             Orders
             <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-semibold">{paidOrders.length}</span>
@@ -368,13 +370,13 @@ const generateInvoicePDF = (order) => {
           ) : paidOrders.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-3">No paid orders yet.</p>
           ) : (
-<div className="space-y-2 max-h-[400px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#bfdbfe transparent' }}>
+<div className="space-y-2 max-h-[400px] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#bfdbfe transparent' }}>
                 {paidOrders.map((order) => (
                 <div key={order._id} className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 hover:border-blue-200 transition-colors">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-700 truncate">{order.projectTitle}</p>
                     <p className="text-[10px] text-gray-400 font-mono truncate">#{order._id.slice(-8)}</p>
-                    <p className="text-xs font-bold text-blue-600 mt-0.5">${parseFloat(order.sellPrice).toFixed(2)}</p>
+                    <p className="text-xs font-bold text-blue-600 mt-0.5">{formatBDT(order.sellPrice, { decimals: 2 })}</p>
                   </div>
                   <button
                     onClick={() => generateInvoicePDF(order)}

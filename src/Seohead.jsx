@@ -19,6 +19,7 @@ const SeoHead = ({
   ogImage = OG_IMAGE,
   ogType = 'website',
   noIndex = false,
+  keywords,
   jsonLd,
 }) => {
   const fullTitle = title ? `${title} | Cloud Company` : DEFAULT_TITLE;
@@ -31,6 +32,7 @@ const SeoHead = ({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
+      {keywords && <meta name="keywords" content={Array.isArray(keywords) ? keywords.join(', ') : keywords} />}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph */}
