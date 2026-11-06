@@ -11,10 +11,12 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Shimmer, ShimmerText, ShimmerList } from "../utils/Shimmer";
-import { formatBDT, formatBDTPlain } from "../utils/currency";
+import { formatBDTPlain } from "../utils/currency";
+import { usePrice } from "../utils/usePrice";
 
 // inside component
 const Cuser = () => {
+  const price = usePrice();
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
   const [paidOrders, setPaidOrders] = useState([]);
@@ -376,7 +378,7 @@ const generateInvoicePDF = (order) => {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-700 truncate">{order.projectTitle}</p>
                     <p className="text-[10px] text-gray-400 font-mono truncate">#{order._id.slice(-8)}</p>
-                    <p className="text-xs font-bold text-blue-600 mt-0.5">{formatBDT(order.sellPrice, { decimals: 2 })}</p>
+                    <p className="text-xs font-bold text-blue-600 mt-0.5">{price.format(order.sellPrice, { decimals: 2 })}</p>
                   </div>
                   <button
                     onClick={() => generateInvoicePDF(order)}

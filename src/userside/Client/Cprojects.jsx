@@ -13,7 +13,7 @@ import { base_url } from "../../config/config";
 import { useNavigate } from "react-router-dom";
 import ProfilePacks from "../packages/profilepacks";
 import { Shimmer } from "../utils/Shimmer";
-import { formatBDT } from "../utils/currency";
+import { usePrice } from "../utils/usePrice";
 import { TimeLeft } from "../utils/TimeLeft";
 
 const statusConfig = {
@@ -79,6 +79,7 @@ const statusMessage = (project) => {
 
 // ── ProjectDetails — the selected project, left side ─────────
 const ProjectDetails = ({ project, onChat, onPay, onClose }) => {
+  const price = usePrice();
   const isCustom = project.orderType === "custom";
   const badge = statusBadgeOf(project);
   const progress = contentsProgress(project);
@@ -92,7 +93,7 @@ const ProjectDetails = ({ project, onChat, onPay, onClose }) => {
     ["Ordered",  formatDate(project.createdAt)],
     ["Started",  project.startedAt ? formatDate(project.startedAt) : "—"],
     ["Delivery", isCustom ? (project.deliveryTime ? `${project.deliveryTime} days` : "—") : (project.time ? `${project.time} days` : "—")],
-    ["Price",    isCustom ? formatBDT(project.packagePrice || project.offeringPrice || 0) : formatBDT(project.sellPrice || 0)],
+    ["Price",    isCustom ? price.format(project.packagePrice || project.offeringPrice || 0) : price.format(project.sellPrice || 0)],
     ["Payment",  project.pstatus === "paid" ? "Paid" : project.paymentStatus || "Not paid"],
   ];
 
@@ -143,7 +144,7 @@ const ProjectDetails = ({ project, onChat, onPay, onClose }) => {
             onClick={() => onPay(project)}
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-sm font-semibold transition-all duration-150 shadow-sm"
           >
-            Pay Now — {formatBDT(due)}
+            Pay Now — {price.format(due)}
           </button>
         )}
 
@@ -217,6 +218,7 @@ const ProjectDetails = ({ project, onChat, onPay, onClose }) => {
 const deliveryDays = (project) => (project.orderType === "custom" ? parseFloat(project.deliveryTime) : Number(project.time)) || 0;
 
 const Cproject = ({ eid }) => {
+  const price = usePrice();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
@@ -401,7 +403,7 @@ const Cproject = ({ eid }) => {
                             onClick={(e) => { e.stopPropagation(); goToPayment(project); }}
                             className="mt-2 w-full py-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition"
                           >
-                            Pay {formatBDT(due)}
+                            Pay {price.format(due)}
                           </button>
                         )}
 

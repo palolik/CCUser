@@ -11,6 +11,12 @@ export const formatBDTPlain = (value, { decimals = 2 } = {}) => {
   return `BDT ${n.toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
 };
 
+// Visitors outside Bangladesh see BDT prices converted to whole US dollars,
+// always rounded up (৳18,000 at 122 → $148).
+export const bdtToUsd = (value, rate) => Math.ceil((Number(value) || 0) / rate);
+
+export const formatUSD = (value) => `$${(Number(value) || 0).toLocaleString('en-US')}`;
+
 // Monthly plans, courses and mentoring store "0" for express — treat that as "no express option".
 export const hasExpress = (pkg) => Number(pkg?.expressDeliveryTime) > 0;
 

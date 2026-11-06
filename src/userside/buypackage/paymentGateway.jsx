@@ -5,7 +5,7 @@ import Navber from '../navBer/navber';
 import Footer from '../footer/footer';
 import SeoHead from '../../Seohead';
 import { Shimmer } from '../utils/Shimmer';
-import { formatBDT } from '../utils/currency';
+import { usePrice } from '../utils/usePrice';
 
 const generateRefCode = () => {
   const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -17,6 +17,7 @@ const generateRefCode = () => {
 };
 
 const PaymentGateway = () => {
+  const price = usePrice();
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -147,18 +148,17 @@ const handleConfirmPayment = async () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Subtotal</p>
-                  <p className="text-slate-800 font-bold text-base sm:text-lg">{formatBDT(orderSummary.subtotal, { decimals: 2 })}</p>
+                  <p className="text-slate-800 font-bold text-base sm:text-lg">{price.format(orderSummary.subtotal, { decimals: 2 })}</p>
                 </div>
-             \
                 {orderSummary.discount > 0 && (
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Discount</p>
-                    <p className="text-emerald-600 font-bold text-base sm:text-lg">− ${orderSummary.discount?.toFixed(2)}</p>
+                    <p className="text-emerald-600 font-bold text-base sm:text-lg">− {price.formatAmount(price.toDisplay(orderSummary.subtotal) - price.toDisplay(orderSummary.totalPrice), { decimals: 2 })}</p>
                   </div>
                 )}
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Total</p>
-                  <p className="text-blue-600 font-black text-xl sm:text-2xl">{formatBDT(orderSummary.totalPrice, { decimals: 2 })}</p>
+                  <p className="text-blue-600 font-black text-xl sm:text-2xl">{price.format(orderSummary.totalPrice, { decimals: 2 })}</p>
                 </div>
               </div>
             </section>

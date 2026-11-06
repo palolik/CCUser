@@ -7,9 +7,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
 import { Shimmer, ShimmerText } from "../utils/Shimmer";
-import { formatBDT, hasExpress, packageUrl } from "../utils/currency";
+import { hasExpress, packageUrl } from "../utils/currency";
+import { usePrice } from "../utils/usePrice";
 
 const ProfilePacks = () => {
+  const price = usePrice();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [category, setCategory] = useState([]);
@@ -177,11 +179,11 @@ const ProfilePacks = () => {
                   </h3>
 
                   <div className="text-center mb-4">
-                    <span className="text-blue-600 text-5xl font-bold">{formatBDT(pack.packagePrice)}</span>
+                    <span className="text-blue-600 text-5xl font-bold">{price.format(pack.packagePrice)}</span>
                     <span className="text-gray-600 text-lg">/plan</span>
                     <p className="text-blue-500 mt-2">
                       {hasExpress(pack)
-                        ? `Express: ${formatBDT(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}`
+                        ? `Express: ${price.format(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}`
                         : `Delivery in ${pack.deliveryTime} days`}
                     </p>
                   </div>

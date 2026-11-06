@@ -10,9 +10,11 @@ import { base_url } from '../../config/config';
 import { GiDiceSixFacesFive } from 'react-icons/gi';
 import SeoHead from '../../Seohead';
 import { Shimmer, ShimmerText } from '../utils/Shimmer';
-import { formatBDT, hasExpress } from '../utils/currency';
+import { hasExpress } from '../utils/currency';
+import { usePrice } from '../utils/usePrice';
 
 const Requireddetails = () => {
+  const price = usePrice();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,6 +81,9 @@ const Requireddetails = () => {
     form.append('bdp', user?.rppic);
     form.append('email', user?.email);
     form.append('country', user?.country);
+    // What the buyer was shown; sellPrice stays in BDT.
+    form.append('currency', price.currency);
+    form.append('quotedPrice', price.toDisplay(finalPrice));
     files.forEach(file => form.append('mainPics', file, file.name));
     try {
       const response = await fetch(`${base_url}/buypackage`, { method: 'POST', body: form });
@@ -89,7 +94,7 @@ const Requireddetails = () => {
             orderId: data.result.insertedId,
             userId: user?.userId,
             orderSummary: {
-              subtotal: parseFloat(packageData.packagePrice),
+              subtotal: totalPrice,
               discount: discountedPrice !== null ? totalPrice - discountedPrice : 0,
               totalPrice: netTotal,
             },
@@ -127,6 +132,9 @@ const Requireddetails = () => {
     form.append('bdp', user?.rppic);
     form.append('email', user?.email);
     form.append('country', user?.country);
+    // What the buyer was shown; sellPrice stays in BDT.
+    form.append('currency', price.currency);
+    form.append('quotedPrice', price.toDisplay(finalPrice));
     files.forEach(file => form.append('mainPics', file, file.name));
 
     try {
@@ -238,7 +246,7 @@ const Requireddetails = () => {
                   <div className="price-card bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col gap-1">
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400">Regular</span>
                     <div className="flex items-end gap-1 mt-1">
-                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{formatBDT(packagePrice)}</span>}
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{price.format(packagePrice)}</span>}
                     </div>
                     <div className="divider my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 flex-wrap">
@@ -258,7 +266,7 @@ const Requireddetails = () => {
                     <div className="absolute top-2 right-2 bg-blue-500/40 text-white text-[8px] sm:text-[10px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded-full">Fast Track</div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1">
-                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded opacity-30" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{formatBDT(Number(expressDeliveryPrice) + Number(packagePrice))}</span>}
+                      {loading ? <Shimmer className="h-8 sm:h-9 w-20 rounded opacity-30" /> : <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{price.format(Number(expressDeliveryPrice) + Number(packagePrice))}</span>}
                     </div>
                     <div className="h-px bg-blue-500/50 my-2" />
                     <div className="flex items-center gap-1.5 text-xs sm:text-sm text-blue-100 flex-wrap">
@@ -398,13 +406,13 @@ const Requireddetails = () => {
                 {/* Price breakdown */}
                 <div className="bill-row text-sm mb-3">
                   <span className="text-slate-500">Base Price</span>
-                  <span className="font-semibold text-slate-800">{formatBDT(packagePrice)}</span>
+                  <span className="font-semibold text-slate-800">{price.format(packagePrice)}</span>
                 </div>
 
                 {isExpress && (
                   <div className="bill-row text-sm mb-3">
                     <span className="text-slate-500">Express Fee</span>
-                    <span className="font-semibold text-blue-600">+{formatBDT(expressDeliveryPrice)}</span>
+                    <span className="font-semibold text-blue-600">+{price.formatAmount(price.toDisplay(totalPrice) - price.toDisplay(packagePrice))}</span>
                   </div>
                 )}
 
@@ -412,7 +420,7 @@ const Requireddetails = () => {
 
                 <div className="bill-row text-sm mb-4">
                   <span className="text-slate-500">Subtotal</span>
-                  <span className="font-bold text-slate-800">{formatBDT(totalPrice, { decimals: 2 })}</span>
+                  <span className="font-bold text-slate-800">{price.format(totalPrice, { decimals: 2 })}</span>
                 </div>
 
                 {/* Express toggle */}
@@ -478,9 +486,9 @@ const Requireddetails = () => {
                   <span className="text-slate-500 text-sm">Net Total</span>
                   <div className="text-right">
                     {discountedPrice !== null && (
-                      <p className="text-xs text-slate-400 line-through">{formatBDT(totalPrice, { decimals: 2 })}</p>
+                      <p className="text-xs text-slate-400 line-through">{price.format(totalPrice, { decimals: 2 })}</p>
                     )}
-                    <p className="text-2xl font-bold text-slate-900">{formatBDT(netTotal, { decimals: 2 })}</p>
+                    <p className="text-2xl font-bold text-slate-900">{price.format(netTotal, { decimals: 2 })}</p>
                   </div>
                 </div>
 

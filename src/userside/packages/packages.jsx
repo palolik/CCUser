@@ -6,9 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { base_url } from "../../config/config";
 import CustomPackageRequest from "../buypackage/custompackage";
 import { Shimmer, ShimmerGrid } from "../utils/Shimmer";
-import { formatBDT, hasExpress, packageUrl } from "../utils/currency";
+import { hasExpress, packageUrl } from "../utils/currency";
+import { usePrice } from "../utils/usePrice";
 
 const Packages = ({ category = [], packages = [], loading = false }) => {
+  const price = usePrice();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
@@ -136,7 +138,7 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
                 <div className="text-center mb-3">
                   <span className={`font-serif text-5xl font-semibold ${pack.featured ? "text-blue-300" : "text-blue-600"}`}
                     style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {formatBDT(pack.packagePrice)}
+                    {price.format(pack.packagePrice)}
                   </span>
                   <span className="text-gray-400 text-sm font-light"> /plan</span>
                 </div>
@@ -145,7 +147,7 @@ const filteredPacks = isCustom ? [] : (packages ?? []).filter(
                     <>
                       Express:{" "}
                       <span className={`font-medium ${pack.featured ? "text-blue-300/60" : "text-blue-500"}`}>
-                        {formatBDT(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}
+                        {price.format(Number(pack.packagePrice) + Number(pack.expressDeliveryPrice))}
                       </span>
                     </>
                   ) : (

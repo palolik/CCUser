@@ -9,7 +9,8 @@ import cover from "/assets/packco.svg";
 import { base_url } from '../../config/config';
 import Comments from '../Comments/comments';
 import { Shimmer, ShimmerText } from '../utils/Shimmer';
-import { formatBDT, hasExpress, packageUrl } from '../utils/currency';
+import { hasExpress, packageUrl } from '../utils/currency';
+import { usePrice } from '../utils/usePrice';
 
 const SITE_URL = 'https://cloudcompany.cc';
 
@@ -20,6 +21,7 @@ const stripHtmlToDescription = (html, maxLength = 160) => {
 };
 
 const PackDetails = () => {
+  const price = usePrice();
   const [packageData, setPackageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -232,7 +234,7 @@ const PackDetails = () => {
                   <div className="price-card bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6 flex flex-col gap-1">
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-slate-400">Regular</span>
                     <div className="flex items-end gap-1 mt-1 sm:mt-2">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{formatBDT(pkg.packagePrice)}</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">{price.format(pkg.packagePrice)}</span>
                     </div>
                     <div className="divider my-2 sm:my-3" />
                     <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 flex-wrap">
@@ -254,7 +256,7 @@ const PackDetails = () => {
                     </div>
                     <span className="text-[10px] sm:text-xs font-semibold tracking-widest uppercase text-blue-200">Express</span>
                     <div className="flex items-end gap-1 mt-1 sm:mt-2">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{formatBDT(Number(pkg.expressDeliveryPrice) + Number(pkg.packagePrice))}</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{price.format(Number(pkg.expressDeliveryPrice) + Number(pkg.packagePrice))}</span>
                     </div>
                     <div className="h-px bg-blue-500/50 my-2 sm:my-3" />
                     <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-blue-100 flex-wrap">
