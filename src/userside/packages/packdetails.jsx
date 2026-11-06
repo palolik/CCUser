@@ -69,7 +69,7 @@ const PackDetails = () => {
       <>
         <Navber />
         <div className="min-h-screen bg-slate-50" role="status" aria-label="Loading">
-          <Shimmer className="w-full h-48 sm:h-64 md:h-96" />
+          <Shimmer className="w-full h-56 sm:h-72 md:h-[28rem] lg:h-[34rem]" />
           <div className="max-w-5xl mx-auto px-3 sm:px-5 md:px-8 py-4 sm:py-6 md:py-10 space-y-4 sm:space-y-6 md:space-y-10">
             <div>
               <Shimmer className="h-3 w-28 rounded mb-2 sm:mb-4" />
@@ -165,9 +165,9 @@ const PackDetails = () => {
         {packageData && pkg ? (
           <>
             {/* ── Hero Cover ── */}
-            <div className="w-full h-48 sm:h-64 md:h-96 overflow-hidden relative fade-in">
+            <div className="w-full h-56 sm:h-72 md:h-[28rem] lg:h-[34rem] overflow-hidden relative fade-in">
               <img
-                src={pkg.packageCover === '' ? pkg.packageCover : cover}
+                src={pkg.packageCover || cover}
                 className="w-full h-full object-cover"
                 alt={pkg.packageName}
               />

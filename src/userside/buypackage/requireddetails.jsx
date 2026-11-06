@@ -204,9 +204,9 @@ const Requireddetails = () => {
       <div className="req-root min-h-screen bg-slate-50">
 
         {/* ── Hero ── */}
-        <div className="w-full h-48 sm:h-64 md:h-80 overflow-hidden relative fade-in">
+        <div className="w-full h-56 sm:h-72 md:h-[26rem] lg:h-[30rem] overflow-hidden relative fade-in">
           <img
-            src={packageCover === '' ? packageCover : cover}
+            src={packageCover || cover}
             alt={packageName}
             className="w-full h-full object-cover"
           />
