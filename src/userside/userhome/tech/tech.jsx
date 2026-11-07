@@ -1,34 +1,34 @@
 // ── asset imports ─────────────────────────────────────────────────────────────
-const ai        = '/assets/ai.png';
-const ps        = '/assets/ps.png';
-const id        = '/assets/id.png';
-const figma     = '/assets/figma.png';
-const xd        = '/assets/xd.png';
+const ai        = '/assets/ai.webp';
+const ps        = '/assets/ps.webp';
+const id        = '/assets/id.webp';
+const figma     = '/assets/figma.webp';
+const xd        = '/assets/xd.webp';
 
-const acd       = '/assets/Autocad.png';
-const blender   = '/assets/Blender.png';
-const maya      = '/assets/maya.png';
-const revit     = '/assets/Revit.png';
-const sketchup  = '/assets/Sketchup.png';
+const acd       = '/assets/Autocad.webp';
+const blender   = '/assets/Blender.webp';
+const maya      = '/assets/maya.webp';
+const revit     = '/assets/Revit.webp';
+const sketchup  = '/assets/Sketchup.webp';
 
-const react     = '/assets/re.png';
-const vue       = '/assets/vue.png';
-const angular   = '/assets/angular.png';
-const tailwind  = '/assets/tailwind.png';
-const bootstrap = '/assets/bootstrap.png';
-const js        = '/assets/js.png';
+const react     = '/assets/re.webp';
+const vue       = '/assets/vue.webp';
+const angular   = '/assets/angular.webp';
+const tailwind  = '/assets/tailwind.webp';
+const bootstrap = '/assets/bootstrap.webp';
+const js        = '/assets/js.webp';
 
-const node      = '/assets/node.png';
-const php       = '/assets/php.png';
-const laravel   = '/assets/laravel.png';
-const ruby      = '/assets/rubi.png';
-const net       = '/assets/net.png';
-const codeigniter = '/assets/agun.png';
+const node      = '/assets/node.webp';
+const php       = '/assets/php.webp';
+const laravel   = '/assets/laravel.webp';
+const ruby      = '/assets/rubi.webp';
+const net       = '/assets/net.webp';
+const codeigniter = '/assets/agun.webp';
 
-const flutter   = '/assets/flutter.png';
-const java      = '/assets/java.png';
-const kotlin    = '/assets/kotlin.png';
-const swift     = '/assets/swift.png';
+const flutter   = '/assets/flutter.webp';
+const java      = '/assets/java.webp';
+const kotlin    = '/assets/kotlin.webp';
+const swift     = '/assets/swift.webp';
 
 
 // ── data ─────────────────────────────────────────────────────────────────────
