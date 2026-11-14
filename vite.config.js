@@ -1,12 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// sitemap.xml is served dynamically by the backend (see
-// cloudcompanyserver/controllers/seo.controller.js) so it can include
-// package/portfolio IDs. A static build-time sitemap here would land in
-// dist/ and shadow that dynamic route in production (per .htaccess's
-// "serve existing file before falling back to index.html" rule) — so this
-// project intentionally does NOT generate its own sitemap.xml.
+// SEO files (per-page HTML with meta + JSON-LD, sitemap.xml, llms.txt) are generated
+// into dist/ after the build by scripts/seo-build.mjs (npm "postbuild").
 
 export default defineConfig({
   plugins: [

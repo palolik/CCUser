@@ -1,0 +1,12 @@
+{
+  "name": "Cloud Company",
+  "short_name": "Cloud Company",
+  "description": "Web development, app development, design and digital marketing agency in Dhaka, Bangladesh.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#021327",
+  "icons": [
+    { "src": "/assets/febicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

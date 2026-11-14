@@ -172,6 +172,9 @@ const router = createBrowserRouter([
   },
 ]);
 
+// Build-time SEO tags (scripts/seo-build.mjs) — react-helmet-async writes its own on mount.
+document.querySelectorAll('[data-prerender]').forEach((el) => el.remove());
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>

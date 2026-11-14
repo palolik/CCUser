@@ -1,59 +1,180 @@
 /* eslint-disable react/prop-types */
-const Ads = ({ adsData = [], location }) => {
-  const filteredAds = adsData.filter(
-    (ad) =>
-      ad.location?.toLowerCase() === location?.toLowerCase() &&
-      ad.status === "pending"
-  );
+import { useEffect, useRef, useState } from "react";
+import { base_url } from "../../../config/config";
+import { AD_SLOTS, adsFor } from "./adSlots";
 
-  const getAdStyle = () => {
-    switch (location) {
-      case "Sidebar":
-        return {
-          container:
-            "fixed left-0 top-1/2 transform -translate-y-1/2 flex flex-col gap-3 p-2 border-r border-red-100 rounded-r-3xl bg-white/50 backdrop-blur-md shadow-md",
-          img: "w-40 h-60 object-cover rounded-2xl hover:scale-105 transition-transform duration-500",
-        };
-      case "Header":
-        return {
-          container:
-            "w-full flex flex-row justify-center items-center border-b border-red-100 py-2 bg-white/70 backdrop-blur-md shadow-sm",
-          img: "w-full max-w-5xl h-28 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500",
-        };
-      case "Footer":
-        return {
-          container:
-            "w-full flex flex-row justify-center items-center border-t border-red-100 py-3 bg-white/70 backdrop-blur-md shadow-sm",
-          img: "w-full max-w-5xl h-24 object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500",
-        };
-      default:
-        return {
-          container: "flex flex-col gap-2",
-          img: "w-32 h-32 object-cover rounded-lg hover:scale-105 transition-transform duration-500",
-        };
-    }
-  };
+const trackClick = (id) => {
+  fetch(`${base_url}/adclicks/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ incrementBy: 1 }),
+  }).catch(() => {});
+};
 
-  const { container, img } = getAdStyle();
+// Cycles through several live ads in one slot.
+const useRotation = (count, ms = 8000) => {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (count < 2) return;
+    const t = setInterval(() => setIndex((i) => (i + 1) % count), ms);
+    return () => clearInterval(t);
+  }, [count, ms]);
+  return count ? index % count : 0;
+};
+
+const AdLink = ({ ad, className, imgClassName, style }) => (
+  <a
+    href={ad.rdlink}
+    target="_blank"
+    rel="noopener noreferrer sponsored"
+    onClick={() => trackClick(ad._id)}
+    className={`relative block overflow-hidden ${className || ""}`}
+    style={style}
+  >
+    <img
+      src={ad.imglink}
+      alt="Advertisement"
+      loading="lazy"
+      className={`w-full h-full object-cover ${imgClassName || ""}`}
+    />
+    <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/50 text-white text-[10px] leading-none">
+      Ad
+    </span>
+  </a>
+);
+
+// Horizontal banner (Header / Homepage Banner / Footer), kept at the slot's aspect ratio.
+export const BannerAd = ({ ads, location, className = "" }) => {
+  const live = adsFor(ads, location);
+  const index = useRotation(live.length);
+  const slot = AD_SLOTS[location];
+  if (!live.length || !slot) return null;
 
   return (
-    <div className={`z-50 ${container}`}>
-      {filteredAds.length > 0 ? (
-        filteredAds.map((ad) => (
-          <a
-            key={ad._id}
-            href={ad.rdlink}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={ad.imglink} className={img} alt={`Ad for ${ad.rdlink}`} />
-          </a>
-        ))
-      ) : (
-        <p className="hidden"></p>
-      )}
+    <div className={`w-full px-4 flex justify-center ${className}`}>
+      <AdLink
+        ad={live[index]}
+        className="w-full rounded-xl shadow-sm"
+        style={{ maxWidth: slot.width, aspectRatio: `${slot.width} / ${slot.height}` }}
+      />
     </div>
   );
 };
 
-export default Ads;
+// True once the marker element has scrolled above the top of the viewport.
+const useScrolledPast = () => {
+  const ref = useRef(null);
+  const [past, setPast] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      if (ref.current) setPast(ref.current.getBoundingClientRect().top <= 0);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return [ref, past];
+};
+
+// Fixed skyscrapers either side of the page on wide screens.
+// "Sidebar" ads appear on both sides; hls / hrs only on their own side.
+// Render this right after the hero: the ads stay hidden until the hero is scrolled past.
+export const SideAds = ({ ads }) => {
+  const left = adsFor(ads, "hls", "Sidebar");
+  const right = adsFor(ads, "hrs", "Sidebar");
+  const leftIndex = useRotation(left.length);
+  const rightIndex = useRotation(right.length);
+  const [markerRef, pastHero] = useScrolledPast();
+  const { width, height } = AD_SLOTS.hls;
+  const style = { width: 120, aspectRatio: `${width} / ${height}` };
+  const visibility = pastHero
+    ? "opacity-100 pointer-events-auto"
+    : "opacity-0 pointer-events-none";
+
+  return (
+    <>
+      <div ref={markerRef} aria-hidden="true" />
+      {left.length > 0 && (
+        <div
+          className={`hidden xl:block fixed left-2 top-1/2 -translate-y-1/2 z-20 transition-opacity duration-300 ${visibility}`}
+        >
+          <AdLink ad={left[leftIndex]} className="rounded-2xl shadow-lg" style={style} />
+        </div>
+      )}
+      {right.length > 0 && (
+        <div
+          className={`hidden xl:block fixed right-2 top-1/2 -translate-y-1/2 z-20 transition-opacity duration-300 ${visibility}`}
+        >
+          <AdLink ad={right[rightIndex]} className="rounded-2xl shadow-lg" style={style} />
+        </div>
+      )}
+    </>
+  );
+};
+
+const POPUP_SEEN_KEY = "cc-ad-popup-seen";
+
+// Shown once per browser session, a few seconds after the page loads.
+export const PopupAd = ({ ads, delay = 4000 }) => {
+  const live = adsFor(ads, "Popup");
+  const [open, setOpen] = useState(false);
+  const ad = live[0];
+
+  useEffect(() => {
+    if (!ad) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(POPUP_SEEN_KEY) === "1";
+    } catch {
+      /* storage blocked */
+    }
+    if (seen) return;
+    const t = setTimeout(() => {
+      setOpen(true);
+      try {
+        sessionStorage.setItem(POPUP_SEEN_KEY, "1");
+      } catch {
+        /* storage blocked */
+      }
+    }, delay);
+    return () => clearTimeout(t);
+  }, [ad, delay]);
+
+  if (!open || !ad) return null;
+  const { width, height } = AD_SLOTS.Popup;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4"
+      onClick={() => setOpen(false)}
+    >
+      <div className="relative w-full max-w-[420px]" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          aria-label="Close advertisement"
+          onClick={() => setOpen(false)}
+          className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow text-gray-700 hover:text-black"
+        >
+          ✕
+        </button>
+        <AdLink
+          ad={ad}
+          className="w-full rounded-2xl shadow-2xl"
+          style={{ aspectRatio: `${width} / ${height}` }}
+        />
+      </div>
+    </div>
+  );
+};

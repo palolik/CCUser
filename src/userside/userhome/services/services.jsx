@@ -1,32 +1,8 @@
-import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { base_url } from "../../../config/config";
 import AnimatedNetworkBackground from "../home/animatednetwork";
 import ServicesAnimatedBackground from "./serviceanimatedbackground";
 import { Shimmer, ShimmerText } from "../../utils/Shimmer";
 const Services = ({ serviceData = [], loading = false }) => {
-  const [ads, setAds] = useState([]);
-
-  useEffect(() => {
-    fetch(`${base_url}/advertise`)
-      .then((res) => res.json())
-      .then(setAds)
-      .catch((err) => console.error("Failed to load ads:", err));
-  }, []);
-
-  const sidebarAds = ads.filter(
-    (ad) => ad.location?.toLowerCase() === "sidebar" && ad.status?.toLowerCase() === "active"
-  );
-
-  const handleAdClick = async (id) => {
-    try {
-      await fetch(`${base_url}/adclicks/${id}`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ incrementBy: 1 }),
-      });
-    } catch (e) { console.error(e); }
-  };
-
   if (loading && (!serviceData || serviceData.length === 0)) {
     return (
       <section className="relative py-24 px-6 bg-white" role="status" aria-label="Loading">
@@ -63,25 +39,9 @@ const Services = ({ serviceData = [], loading = false }) => {
     );
   }
 
-  // Sidebar ad component
-  const SidebarAds = ({ side }) => (
-    <div className={`hidden lg:flex flex-col gap-3 fixed top-1/2 -translate-y-1/2 z-20 ${side === "left" ? "left-2" : "right-2"}`}>
-    
-  {sidebarAds.map((ad) => (
-        <a key={ad._id + side} href={ad.rdlink} target="_blank" rel="noopener noreferrer"
-          onClick={() => handleAdClick(ad._id)}>
-          <img src={ad.imglink} alt={ad.rdlink}
-            className="w-28 h-[560px] object-cover rounded-2xl shadow-lg hover:shadow-xl transition-shadow" />
-        </a>
-      ))}
-    </div>
-  );
-
   return (
     <section className="relative py-24 px-6 bg-white">
   <ServicesAnimatedBackground />
-      <SidebarAds side="left" />
-      <SidebarAds side="right" />
 
       {/* Header */}
       <div className="text-center mb-16">

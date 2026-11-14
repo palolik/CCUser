@@ -4,6 +4,7 @@ import { base_url } from "../../config/config";
 import Navber from "../navBer/navber";
 import Footer from "../footer/footer";
 import Home3 from "./home/home3";
+import { BannerAd, SideAds, PopupAd } from "./ads/Ads";
 import SeoHead from "../../Seohead";
 import { Shimmer, ShimmerGrid } from "../utils/Shimmer";
 
@@ -65,6 +66,26 @@ const LazySection = ({ children }) => {
       ) : null}
     </div>
   );
+};
+
+const stripHtml = (html = "") =>
+  String(html).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+
+// FAQPage structured data for answer engines (Google snippets, AI assistants).
+const faqJsonLd = (faqs = []) => {
+  const items = faqs
+    .map((f) => ({ q: stripHtml(f.faqquestion), a: stripHtml(f.faqanswer) }))
+    .filter((f) => f.q && f.a);
+  if (!items.length) return undefined;
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
 };
 
 const Viewer = () => {
@@ -200,16 +221,21 @@ const Viewer = () => {
   return (
     <div className="overflow-x-hidden w-full">
       <SeoHead
-        title="Cloud Company"
+        title="Web, App, Design & Digital Marketing Agency in Bangladesh"
         description="Cloud Company helps businesses grow online with custom web development, app development, graphic design, social media marketing, and product design. Reliable tech since 2019."
         canonical="/"
         ogType="website"
+        jsonLd={faqJsonLd(data.faqs)}
       />
 
       <Navber />
 
       {/* This loads instantly */}
       <Home3 />
+
+      <SideAds ads={data.adsData} />
+      <PopupAd ads={data.adsData} />
+      <BannerAd ads={data.adsData} location="Header" className="py-6" />
 
       {/* These load only when user scrolls near them */}
       <LazySection>
@@ -227,6 +253,8 @@ const Viewer = () => {
       <LazySection>
         <Process />
       </LazySection>
+
+      <BannerAd ads={data.adsData} location="Homepage Banner" className="py-8" />
 
       <LazySection>
         <Packages
@@ -257,6 +285,8 @@ const Viewer = () => {
       <LazySection>
         <Faq faqs={data.faqs} loading={secondaryLoading} />
       </LazySection>
+
+      <BannerAd ads={data.adsData} location="Footer" className="py-6" />
 
       <Footer />
     </div>
