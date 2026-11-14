@@ -30,6 +30,16 @@ const java      = '/assets/java.webp';
 const kotlin    = '/assets/kotlin.webp';
 const swift     = '/assets/swift.webp';
 
+const canva        = '/assets/tech/canva.svg';
+const aftereffects = '/assets/tech/aftereffects.svg';
+const premierepro  = '/assets/tech/premierepro.svg';
+const sketch       = '/assets/tech/sketch.svg';
+const framer       = '/assets/tech/framer.svg';
+const webflow      = '/assets/tech/webflow.svg';
+const storybook    = '/assets/tech/storybook.svg';
+const threedsmax   = '/assets/tech/threedsmax.svg';
+const firebase     = '/assets/tech/firebase.svg';
+
 
 // ── data ─────────────────────────────────────────────────────────────────────
 const sections = [
@@ -40,6 +50,9 @@ const sections = [
       { src: ai, label: 'Illustrator' },
       { src: ps, label: 'Photoshop' },
       { src: id, label: 'InDesign' },
+      { src: canva, label: 'Canva' },
+      { src: aftereffects, label: 'After Effects' },
+      { src: premierepro, label: 'Premiere Pro' },
     ],
   },
   {
@@ -48,6 +61,10 @@ const sections = [
     items: [
       { src: figma, label: 'Figma' },
       { src: xd, label: 'Adobe XD' },
+      { src: sketch, label: 'Sketch' },
+      { src: framer, label: 'Framer' },
+      { src: webflow, label: 'Webflow' },
+      { src: storybook, label: 'Storybook' },
     ],
   },
   {
@@ -59,6 +76,7 @@ const sections = [
       { src: sketchup, label: 'SketchUp' },
       { src: maya, label: 'Maya' },
       { src: revit, label: 'Revit' },
+      { src: threedsmax, label: '3ds Max' },
     ],
   },
   {
@@ -95,6 +113,7 @@ const sections = [
       { src: java, label: 'Java' },
       { src: kotlin, label: 'Kotlin' },
       { src: swift, label: 'Swift' },
+      { src: firebase, label: 'Firebase' },
     ],
   },
 ];

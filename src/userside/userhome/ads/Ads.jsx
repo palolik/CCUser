@@ -89,11 +89,16 @@ const useScrolledPast = () => {
 };
 
 // Fixed skyscrapers either side of the page on wide screens.
-// "Sidebar" ads appear on both sides; hls / hrs only on their own side.
-// Render this right after the hero: the ads stay hidden until the hero is scrolled past.
-export const SideAds = ({ ads }) => {
-  const left = adsFor(ads, "hls", "Sidebar");
-  const right = adsFor(ads, "hrs", "Sidebar");
+// Home: "Sidebar" ads on both sides, hls / hrs on their own side.
+// Blog posts pass leftLocations={["bls", "Blog Sidebar"]} rightLocations={["brs", "Blog Sidebar"]}.
+// Render this right after the hero/header: the ads stay hidden until it is scrolled past.
+export const SideAds = ({
+  ads,
+  leftLocations = ["hls", "Sidebar"],
+  rightLocations = ["hrs", "Sidebar"],
+}) => {
+  const left = adsFor(ads, ...leftLocations);
+  const right = adsFor(ads, ...rightLocations);
   const leftIndex = useRotation(left.length);
   const rightIndex = useRotation(right.length);
   const [markerRef, pastHero] = useScrolledPast();

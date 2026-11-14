@@ -22,7 +22,8 @@ const BlogJsxRenderer = ({ blog }) => {
   useEffect(() => {
     const handleMessage = (event) => {
       if (event.data?.type === "BLOG_IFRAME_HEIGHT") {
-        setIframeHeight(Number(event.data.height || 1200) + 40);
+        const next = Math.ceil(Number(event.data.height) || 0) + 40;
+        if (next > 40) setIframeHeight((prev) => (Math.abs(prev - next) > 2 ? next : prev));
       }
     };
 
@@ -55,11 +56,16 @@ const BlogJsxRenderer = ({ blog }) => {
     #root {
       width: 100%;
       min-width: 100%;
-      min-height: 100%;
       margin: 0;
       padding: 0;
       background: #ffffff;
       overflow-x: hidden;
+    }
+
+    /* Contain children's margins so #root's height is the real content height. */
+    #root {
+      display: flow-root;
+      padding: 20px 0;
     }
 
     * {
@@ -122,20 +128,15 @@ const BlogJsxRenderer = ({ blog }) => {
     const blog = ${safeBlog};
     const images = ${safeImages};
 
+    // Report the content's own height, never the document/viewport height: the viewport
+    // is the iframe itself, so measuring it made the iframe grow on every report.
+    const rootEl = document.getElementById("root");
+    let lastHeight = 0;
     const sendHeight = () => {
-      setTimeout(() => {
-        const height = Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.offsetHeight
-        );
-
-        window.parent.postMessage({
-          type: "BLOG_IFRAME_HEIGHT",
-          height
-        }, "*");
-      }, 300);
+      const height = Math.ceil(rootEl.getBoundingClientRect().height);
+      if (!height || Math.abs(height - lastHeight) < 2) return;
+      lastHeight = height;
+      window.parent.postMessage({ type: "BLOG_IFRAME_HEIGHT", height }, "*");
     };
 
     try {
@@ -149,10 +150,9 @@ const BlogJsxRenderer = ({ blog }) => {
         <BlogPost blog={blog} images={images} />
       );
 
-      sendHeight();
+      setTimeout(sendHeight, 0);
       window.addEventListener("load", sendHeight);
-      window.addEventListener("resize", sendHeight);
-      setInterval(sendHeight, 1000);
+      new ResizeObserver(sendHeight).observe(rootEl);
     } catch (error) {
       document.getElementById("root").innerHTML =
         '<div style="padding:30px;color:#dc2626;font-family:Arial;">' +
@@ -181,7 +181,7 @@ const BlogJsxRenderer = ({ blog }) => {
   }
 
   return (
-    <div className="w-full min-w-0 overflow-hidden rounded-2xl bg-white">
+    <div className="w-full min-w-0 overflow-hidden rounded-2xl bg-white px-3 sm:px-7">
       <iframe
         title={blog?.title || "Blog"}
         srcDoc={iframeHtml}

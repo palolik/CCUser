@@ -5,6 +5,7 @@ import Footer from "../footer/footer";
 import SeoHead from "../../Seohead";
 import { base_url } from "../../config/config";
 import BlogJsxRenderer from "./BlogJsxRenderer";
+import { SideAds } from "../userhome/ads/Ads";
 import { Shimmer, ShimmerText } from "../utils/Shimmer";
 
 const formatDate = (d) =>
@@ -16,6 +17,15 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  const [ads, setAds] = useState([]);
+
+  useEffect(() => {
+    fetch(`${base_url}/advertise`)
+      .then((res) => res.json())
+      .then((data) => setAds(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -41,9 +51,9 @@ const BlogDetail = () => {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Navber />
-        <section className="px-6 py-16" role="status" aria-label="Loading"
+        <section className="py-16" role="status" aria-label="Loading"
           style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
-          <div className="max-w-3xl mx-auto opacity-20">
+          <div className="max-w-4xl mx-auto px-6 sm:px-[52px] opacity-20">
             <Shimmer className="h-4 w-28 rounded mb-8" />
             <Shimmer className="h-9 md:h-12 w-full rounded mb-3" />
             <Shimmer className="h-9 md:h-12 w-2/3 rounded mb-5" />
@@ -51,8 +61,8 @@ const BlogDetail = () => {
             <Shimmer className="h-4 w-64 max-w-full rounded" />
           </div>
         </section>
-        <div className="max-w-3xl mx-auto w-full px-6 py-10 flex-1">
-          <div className="w-full flex flex-col gap-6 p-6 bg-white rounded-2xl" aria-hidden="true">
+        <div className="max-w-4xl mx-auto w-full px-3 sm:px-6 py-8 sm:py-10 flex-1">
+          <div className="w-full flex flex-col gap-6 px-3 sm:px-7 py-6 bg-white rounded-2xl" aria-hidden="true">
             <Shimmer className="h-6 w-2/3 rounded" />
             <ShimmerText lines={4} />
             <Shimmer className="h-48 sm:h-64 w-full rounded-xl" />
@@ -100,9 +110,11 @@ const BlogDetail = () => {
       />
       <Navber />
 
-      <section className="px-6 py-16"
+      <section className="py-16"
         style={{ background: "linear-gradient(150deg,#050d1f 0%,#0d1b3e 55%,#091528 100%)" }}>
-        <div className="max-w-3xl mx-auto">
+        {/* Side padding = content column (px-3 / sm:px-6) + article card (px-3 / sm:px-7),
+            so the title lines up with the first line of the article. */}
+        <div className="max-w-4xl mx-auto px-6 sm:px-[52px]">
           <button onClick={() => navigate("/blog")}
             className="inline-flex items-center gap-2 text-blue-300/80 hover:text-blue-300 text-sm font-light mb-8 transition-colors">
             ← Back to Blog
@@ -137,7 +149,9 @@ const BlogDetail = () => {
         </div>
       </section>
 
-      <div className="max-w-3xl mx-auto w-full px-6 py-10 flex-1">
+      <SideAds ads={ads} leftLocations={["bls", "Blog Sidebar"]} rightLocations={["brs", "Blog Sidebar"]} />
+
+      <div className="max-w-4xl mx-auto w-full px-3 sm:px-6 py-8 sm:py-10 flex-1">
         <BlogJsxRenderer blog={blog} />
       </div>
 

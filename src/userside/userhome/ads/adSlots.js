@@ -9,6 +9,9 @@ export const AD_SLOTS = {
   hrs: { label: "Home right sidebar", width: 160, height: 600 },
   Sidebar: { label: "Both home sidebars", width: 160, height: 600 },
   Popup: { label: "Popup", width: 600, height: 600 },
+  bls: { label: "Blog left sidebar", width: 160, height: 600 },
+  brs: { label: "Blog right sidebar", width: 160, height: 600 },
+  "Blog Sidebar": { label: "Both blog sidebars", width: 160, height: 600 },
 };
 
 const startOfDay = (d) => {

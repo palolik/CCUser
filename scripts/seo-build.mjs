@@ -80,6 +80,57 @@ const ymd = (d) => {
 
 const packagePath = (pkg) => `/packdetails/${pkg.slug || pkg._id}`;
 
+// Old uploads were saved with http:// API URLs; the API also serves them over https.
+const secure = (u) =>
+  typeof u === "string" ? u.replace(/^http:\/\/api\.cloudcompany\.cc/i, "https://api.cloudcompany.cc") : u;
+
+async function getText(p) {
+  try {
+    const res = await fetch(`${API}${p}`, { signal: AbortSignal.timeout(15000) });
+    return res.ok ? await res.text() : null;
+  } catch {
+    return null;
+  }
+}
+
+// Blog posts are JSX files rendered in an iframe, which crawlers index poorly. Turn the
+// static markup inside the component's return (...) into plain, safe HTML for the static page.
+const ARTICLE_TAGS = new Set(["h2", "h3", "h4", "p", "ul", "ol", "li", "table", "thead", "tbody", "tr", "th", "td", "a", "strong", "em", "blockquote", "br"]);
+const jsxToHtml = (code) => {
+  if (!code) return "";
+  const start = code.indexOf("return (");
+  const end = code.lastIndexOf(");");
+  if (start === -1 || end <= start) return "";
+  let m = code.slice(start + "return (".length, end);
+  m = m
+    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, "")
+    .replace(/\{\s*["'`]\s*["'`]\s*\}/g, " ")
+    .replace(/\{\s*["'`]([^"'`{}]*)["'`]\s*\}/g, "$1")
+    .replace(/\{[^{}]*\}/g, "");
+  m = m.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)([^>]*)>/g, (tag, name, attrs) => {
+    const n = name.toLowerCase();
+    if (!ARTICLE_TAGS.has(n)) return " ";
+    if (tag.startsWith("</")) return `</${n}>`;
+    if (n === "a") {
+      const href = (attrs.match(/href="(https?:\/\/[^"]+)"/) || [])[1];
+      return href ? `<a href="${esc(href)}">` : "<a>";
+    }
+    return `<${n}>`;
+  });
+  return m.replace(/\s+/g, " ").replace(/> </g, "><").trim();
+};
+
+// Q&A pairs (<h3>question</h3><p>answer</p>) from an article's "Frequently asked questions" section.
+const articleFaqs = (html = "") => {
+  const section = html.split(/<h2>\s*Frequently asked questions\s*<\/h2>/i)[1];
+  if (!section) return [];
+  const body = section.split(/<h2>/i)[0];
+  const strip = (x) => decodeEntities(x.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+  return [...body.matchAll(/<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/gi)]
+    .map((m) => ({ q: strip(m[1]), a: strip(m[2]) }))
+    .filter((f) => f.q && f.a);
+};
+
 async function getJson(p) {
   try {
     const res = await fetch(`${API}${p}`, { signal: AbortSignal.timeout(15000) });
@@ -105,8 +156,13 @@ const services = (secondary?.services || []).filter((s) => s.serviceTitle);
 const faqs = (secondary?.faqs || [])
   .map((f) => ({ q: plain(f.faqquestion), a: plain(f.faqanswer) }))
   .filter((f) => f.q && f.a);
-const blogs = (Array.isArray(blogsRaw) ? blogsRaw : blogsRaw?.blogs || []).filter(
-  (b) => b.slug && b.title && (!b.status || b.status === "published")
+const blogs = (Array.isArray(blogsRaw) ? blogsRaw : blogsRaw?.blogs || [])
+  .filter((b) => b.slug && b.title && (!b.status || b.status === "published"))
+  .map((b) => ({ ...b, coverImage: secure(b.coverImage) }));
+const articleHtml = Object.fromEntries(
+  await Promise.all(
+    blogs.map(async (b) => [b.slug, b.jsxFile ? jsxToHtml(await getText(`/blogjsx/${b.slug}`)) : ""])
+  )
 );
 const portfolio = (Array.isArray(portfolioRaw) ? portfolioRaw : portfolioRaw?.data || []).filter(
   (p) => p.status === "visible"
@@ -322,7 +378,7 @@ for (const p of packages) {
     route,
     title: p.metaTitle || p.packageName,
     description,
-    ogImage: p.packageCover || DEFAULT_OG,
+    ogImage: secure(p.packageCover) || DEFAULT_OG,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -331,7 +387,7 @@ for (const p of packages) {
         description,
         serviceType: p.category,
         url,
-        ...(p.packageCover && { image: p.packageCover }),
+        ...(p.packageCover && { image: secure(p.packageCover) }),
         areaServed: { "@type": "Country", name: "Bangladesh" },
         provider: { "@type": "Organization", name: "Cloud Company", url: SITE },
         offers: {
@@ -404,6 +460,7 @@ for (const b of blogs) {
         ...(Array.isArray(b.tags) && b.tags.length && { keywords: b.tags.join(", ") }),
       },
       breadcrumb({ name: "Blog", url: `${SITE}/blog` }, { name: b.title, url }),
+      ...faqPage(articleFaqs(articleHtml[b.slug])),
     ],
     body: `<p><a href="/blog">Blog</a></p>
 <article>
@@ -411,6 +468,7 @@ for (const b of blogs) {
 <p>By ${esc(b.author || "Cloud Company")} · ${esc(ymd(b.createdAt))}</p>
 <p>${esc(b.shortDescription || "")}</p>
 ${Array.isArray(b.tags) && b.tags.length ? `<p>Topics: ${b.tags.map(esc).join(", ")}</p>` : ""}
+${articleHtml[b.slug] || ""}
 </article>`,
   });
 }
