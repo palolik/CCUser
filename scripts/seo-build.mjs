@@ -10,6 +10,7 @@
 //     #root. React replaces that text on load, so visitors see the normal app.
 //   • sitemap.xml — every public URL on cloudcompany.cc.
 //   • llms.txt    — plain-language summary of the company for AI assistants.
+//   • llms-full.txt — full package details and FAQs, copied from the API's live version.
 //
 // .htaccess serves /some/path from some/path.html when that file exists.
 // API base: SEO_API_URL env var, default https://api.cloudcompany.cc. If the API is
@@ -561,7 +562,13 @@ ${sitemapEntries
 `
 );
 
-// ── llms.txt ─────────────────────────────────────────────────────────────────
+// ── llms.txt / llms-full.txt ─────────────────────────────────────────────────
+
+// The API builds the long version (every package with details and its own FAQ).
+// Only copy it when it looks like the expected markdown, never an error page.
+const llmsFullRaw = await getText("/llms-full.txt");
+const llmsFull = llmsFullRaw && llmsFullRaw.startsWith("# ") ? llmsFullRaw : null;
+if (!llmsFull) console.warn("[seo] /llms-full.txt unavailable — writing llms.txt only");
 
 const md = (s) => String(s || "").replace(/\s+/g, " ").trim();
 const llms = `# Cloud Company
@@ -608,9 +615,14 @@ ${blogs.map((b) => `- [${md(b.title)}](${SITE}/blog/${b.slug}): ${md(b.shortDesc
 - [Portfolio](${SITE}/portfolio)
 - [Blog](${SITE}/blog)
 - [Careers](${SITE}/career)
-`;
+${llmsFull ? `
+## Optional
+
+- [Full package details and FAQs](${SITE}/llms-full.txt)
+` : ""}`;
 fs.writeFileSync(path.join(DIST, "llms.txt"), llms.replace(/\n{3,}/g, "\n\n"));
+if (llmsFull) fs.writeFileSync(path.join(DIST, "llms-full.txt"), llmsFull);
 
 console.log(
-  `[seo] wrote ${written.length} pages (${packages.length} packages, ${blogs.length} blog posts), sitemap.xml (${sitemapEntries.length} URLs), llms.txt`
+  `[seo] wrote ${written.length} pages (${packages.length} packages, ${blogs.length} blog posts), sitemap.xml (${sitemapEntries.length} URLs), llms.txt${llmsFull ? ", llms-full.txt" : ""}`
 );
